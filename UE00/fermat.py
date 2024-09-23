@@ -6,6 +6,7 @@ __copyright__ = "Copyright 2024"
 __license__ = "GPL"
 __status__ = "In Progress"
 """
+from collections import Counter
 
 
 def fermat(p):
@@ -28,17 +29,26 @@ def fermat(p):
     """
     return [pow(a, p - 1, p) for a in range(1, p)]
 
-
-def main():
-    # A.1 -------------------------------------
-
-    # A.1.1 -------------
-    print(fermat(2))
-    print(fermat(3))
-    print(fermat(5))
-    print(fermat(7))
-    print(fermat(997))
+def display(values, p):
+    counter = Counter(values)
+    total = len(values)
+    percentage = (counter[1] / total) * 100 if 1 in counter else 0
+    print(f"{p} -> {percentage:.2f} % -> res[1]={counter[1]},"
+          f" len(res)={total} - {list(counter.items())}")
 
 
 if __name__ == "__main__":
-    main()
+    # A.1 -------------------------------------
+
+    # A.1.1 -------------
+    primes = list(range(2, 12)) + [997]
+    non_primes = [9, 15, 21, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562,
+                  563, 564, 565, 566, 567, 568, 569, 6601, 8911]
+
+    print("Ergebnisse für Primzahlen von 2 bis 11 und 997:")
+    for p in primes:
+        display(fermat(p), p)
+
+    print("\nErgebnisse für Nicht-Primzahlen:")
+    for p in non_primes:
+        display(fermat(p), p)
