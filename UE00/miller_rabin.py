@@ -71,7 +71,7 @@ def is_prim(n):
     """
     Überprüft, ob die gegebene Zahl eine Primzahl ist. Indem sie sie durch die ersten 100 Primzahlen teilt und den
     Miller-Rabin-Test anwendet.
-    :param number: Die zu überprüfende Zahl.
+    :param n: Die zu überprüfende Zahl.
     :return: True, wenn die Zahl eine Primzahl ist, False sonst.
     >>> is_prim(2)
     True
@@ -88,5 +88,12 @@ def is_prim(n):
         if n % p == 0:
             return n == p
     return is_prim_millerrabin(n) == "probably prime"
+
+
+def generate_prime(bits):
+    while True:
+        n = random.getrandbits(bits) | 1 << (bits - 1) | 1
+        if is_prim(n):
+            return n
 
 # if __name__ == "__main__":
