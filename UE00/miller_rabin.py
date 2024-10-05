@@ -75,8 +75,18 @@ def is_prim(n):
     :return: True, wenn die Zahl eine Primzahl ist, False sonst.
     >>> is_prim(2)
     True
+    >>> is_prim(13)
+    True
+    >>> is_prim(541)
+    True
+    >>> is_prim(543)
+    False
+    >>> is_prim(643)
+    True
     """
     for p in FIRST_100_PRIMES:
         if n % p == 0:
             return n == p
     return is_prim_millerrabin(n) == "probably prime"
+
+# if __name__ == "__main__":
