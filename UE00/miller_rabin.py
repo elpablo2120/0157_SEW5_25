@@ -71,6 +71,7 @@ def is_prim(n):
     """
     Überprüft, ob die gegebene Zahl eine Primzahl ist. Indem sie sie durch die ersten 100 Primzahlen teilt und den
     Miller-Rabin-Test anwendet.
+
     :param n: Die zu überprüfende Zahl.
     :return: True, wenn die Zahl eine Primzahl ist, False sonst.
     >>> is_prim(2)
@@ -91,9 +92,58 @@ def is_prim(n):
 
 
 def generate_prime(bits):
+    """
+    Generiert eine Primzahl mit der gegebenen Bitlänge. Überprüfung durch is_prim.
+
+    :param bits: Länge der Primzahl in Bits.
+    :return: Primzahl mit der gegebenen Bitlänge, die mit 1 beginnt und endet.
+    >>> n = generate_prime(4)
+    >>> len(bin(n)[2:]) == 4
+    True
+    >>> n = generate_prime(1024)
+    >>> len(bin(n)[2:]) == 1024
+    True
+    """
     while True:
         n = random.getrandbits(bits) | 1 << (bits - 1) | 1
         if is_prim(n):
             return n
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
+    number = pow(2, 512) + 1
+    while not is_prim(number):
+        number += 2
+    print(f"\nErste Primzahl mit mehr als 512 Bits: {number} \n")
+
+    number_to_test = 24566544301293569
+    if is_prim(number_to_test):
+        print(f"{number_to_test} ist eine Primzahl. \n")
+    else:
+        print(f"{number_to_test} ist keine Primzahl. \n")
+
+    print("\nVersteckte Nachricht in 24566544301293569 als Binärzahl mit 12 Zeichen/Zeile:")
+    binary = bin(24566544301293569)[2:]
+    for i in range(0, len(binary), 12):
+        print(binary[i:i + 12])
+
+    print("\nVersteckte Nachricht in 24566544301293569 als ASCII-Zeichen:")
+    ascii = "".join([chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8)])
+    print(ascii)
+
+    print("\nNächst höhere Primzahl von 24566544301293569:")
+    prime_higher = 24566544301293570
+    while not is_prim(prime_higher):
+        prime_higher += 1
+    print(prime_higher)
+
+    print("\nVersteckte Nachricht in nächst höhere Prim als Binärzahl mot 12 Zeichen/Zeile:")
+    binary = bin(24566544301293587)[2:]
+    for i in range(0, len(binary), 12):
+        print(binary[i:i + 12])
+
+    print("\nVersteckte Nachricht in nächst höhere Prim als ASCII-Zeichen:")
+    ascii = "".join([chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8)])
+    print(ascii)
+
+
+
