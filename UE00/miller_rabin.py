@@ -127,10 +127,6 @@ if __name__ == "__main__":
     for i in range(0, len(binary), 12):
         print(binary[i:i + 12])
 
-    print("\nVersteckte Nachricht in 24566544301293569 als ASCII-Zeichen:")
-    ascii = "".join([chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8)])
-    print(ascii)
-
     print("\nNächst höhere Primzahl von 24566544301293569:")
     prime_higher = 24566544301293570
     while not is_prim(prime_higher):
@@ -142,6 +138,3 @@ if __name__ == "__main__":
     for i in range(0, len(binary), 12):
         print(binary[i:i + 12])
 
-    print("\nVersteckte Nachricht in nächst höhere Prim als ASCII-Zeichen:")
-    ascii = "".join([chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8)])
-    print(ascii)
