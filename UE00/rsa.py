@@ -1,5 +1,12 @@
+"""
+__author__ = "Paul Waldecker"
+__email__ = "0157@htl.rennweg.at"
+__version__ = "1.0"
+__copyright__ = "Copyright 2024"
+__license__ = "GPL"
+__status__ = "In Progress"
+"""
 import random
-
 import miller_rabin
 import math
 
@@ -22,7 +29,7 @@ def ggt(x: int, y: int) -> int:
     return x
 
 
-def generate_keys(bits):
+def generate_keys(bits: int):
     while True:
         p = miller_rabin.generate_prime(math.ceil(bits / 2) + 1)
         q = miller_rabin.generate_prime(bits // 2)
@@ -46,11 +53,9 @@ def generate_keys(bits):
 
 
 if __name__ == "__main__":
-
     private_key, public_key = generate_keys(1024)
     print(f"Private key: {private_key[0].bit_length()}")
     print(f"Public key: {public_key[0].bit_length()}")
     print(f"Private key bit length: {private_key[2]}")
     print(f"Public key bit length: {public_key[2]}")
     print(f"n bit length: {public_key[1].bit_length()}")
-

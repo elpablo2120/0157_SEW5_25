@@ -109,6 +109,7 @@ def generate_prime(bits):
         if is_prim(n):
             return n
 
+
 if __name__ == "__main__":
     number = pow(2, 512) + 1
     while not is_prim(number):
@@ -144,6 +145,3 @@ if __name__ == "__main__":
     print("\nVersteckte Nachricht in nächst höhere Prim als ASCII-Zeichen:")
     ascii = "".join([chr(int(binary[i:i + 8], 2)) for i in range(0, len(binary), 8)])
     print(ascii)
-
-
-

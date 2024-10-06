@@ -1,3 +1,11 @@
+"""
+__author__ = "Paul Waldecker"
+__email__ = "0157@htl.rennweg.at"
+__version__ = "1.0"
+__copyright__ = "Copyright 2024"
+__license__ = "GPL"
+__status__ = "Ready to Review"
+"""
 import time
 
 
@@ -12,6 +20,8 @@ def pow_iterativ(b, e, m):
     7
     >>> pow_iterativ(63, 17, 91)
     7
+    >>> pow(13, -1, 396)
+    61
     """
     result = 1
     while e > 0:
