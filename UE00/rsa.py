@@ -51,6 +51,57 @@ def generate_keys(bits: int):
 
     return public_key, private_key
 
+def file2ints(filename, bytelength):
+    """
+    Reads a file and converts it to a list of integers.
+    :param filename: The name of the file.
+    :return: A list of integers.
+    """
+    with open(filename, "rb") as file:
+        while (byte := file.read(bytelength)):
+            yield int.from_bytes(byte, byteorder="big")
+
+
+def ints2file(filename, ints, bytelength):
+    """
+    Writes a list of integers to a file.
+    :param filename: The name of the file.
+    :param ints: The list of integers.
+    :param bytelength: The byte length used for each integer.
+    """
+    with open(filename, "ab") as file:
+        for i in ints:
+            # Convert integer to bytes and remove leading null bytes before writing
+            byte_data = i.to_bytes(bytelength, byteorder="big").lstrip(b'\x00')
+            file.write(byte_data)
+
+
+def encryptFile(clearfile, cryptfile, public_key):
+    """
+    Encrypts a message using the public key.
+    :param m: The message to encrypt.
+    :param public_key: The public key.
+    :return: The encrypted message.
+    """
+    with open(cryptfile, "w") as file:
+        file.write("")
+    for i in file2ints(clearfile, public_key[1].bit_length() // 8):
+        ints2file(cryptfile, [pow(i, public_key[0], public_key[1])], public_key[1].bit_length() // 8 + 1)
+
+def decryptFile(cryptfile, clearfile, private_key):
+    """
+    Encrypts a message using the public key.
+    :param m: The message to encrypt.
+    :param public_key: The public key.
+    :return: The encrypted message.
+    """
+    with open(clearfile, "w") as file:
+        file.write("")
+    for i in file2ints(cryptfile, private_key[1].bit_length() // 8 + 1):
+        ints2file(clearfile, [pow(i, private_key[0], private_key[1])], private_key[1].bit_length() // 8)
+
+
+
 
 if __name__ == "__main__":
     private_key, public_key = generate_keys(1024)
@@ -59,3 +110,6 @@ if __name__ == "__main__":
     print(f"Private key bit length: {private_key[2]}")
     print(f"Public key bit length: {public_key[2]}")
     print(f"n bit length: {public_key[1].bit_length()}")
+
+    encryptFile("test.txt", "test_encrypted.txt", public_key)
+    decryptFile("test_encrypted.txt", "test_decrypted.txt", private_key)
