@@ -4,7 +4,7 @@ __email__ = "0157@htl.rennweg.at"
 __version__ = "1.0"
 __copyright__ = "Copyright 2024"
 __license__ = "GPL"
-__status__ = "Ready to Reviwew"
+__status__ = "Ready to Review"
 """
 import argparse
 import logging
