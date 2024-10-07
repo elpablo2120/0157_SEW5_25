@@ -127,7 +127,6 @@ def get_encrypted_filename(original_filename):
 
 def get_decrypted_filename(original_filename):
     """Erzeugt den Dateinamen für die entschlüsselte Datei."""
-    # Remove '_encrypted' from the original filename and add '_decrypted'
     name, ext = os.path.splitext(original_filename)
     if name.endswith('_encrypted'):
         name = name[:-len('_encrypted')]
