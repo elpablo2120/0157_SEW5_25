@@ -4,7 +4,7 @@ __email__ = "0157@htl.rennweg.at"
 __version__ = "1.0"
 __copyright__ = "Copyright 2024"
 __license__ = "GPL"
-__status__ = "In Progress"
+__status__ = "Ready to Reviwew"
 """
 import argparse
 import logging
@@ -34,6 +34,11 @@ def ggt(x: int, y: int) -> int:
 
 
 def generate_keys(bits: int):
+    """
+    Generiert einen öffentlichen und privaten Schlüssel.
+    :param bits: Länge des Schlüssels in Bits
+    :return: public_key, private_key mit Schlüssel, N und Bitlänge vom Schlüssel
+    """
     while True:
         p = miller_rabin.generate_prime(math.ceil(bits / 2) + 1)
         q = miller_rabin.generate_prime(bits // 2)
@@ -57,9 +62,10 @@ def generate_keys(bits: int):
 
 def file2ints(filename, bytelength):
     """
-    Reads a file and converts it to a list of integers.
-    :param filename: The name of the file.
-    :return: A list of integers.
+    Liesst eine Datei und gibt die Bytes als Integer zurück.
+    :param filename: Name der Datei.
+    :param bytelength: Anzahl der Bytes, die gelesen werden sollen.
+    :return: Generator für die Bytes der Datei.
     """
     with open(filename, "rb") as file:
         while (byte := file.read(bytelength)):
@@ -105,12 +111,12 @@ def decryptFile(cryptfile, clearfile, private_key):
         ints2file(clearfile, [pow(i, private_key[0], private_key[1])], private_key[1].bit_length() // 8)
 
 def save_key(key, filename):
-    """Saves the key (public or private) to a file using pickle."""
+    """Speichert den Schlüssel (öffentlich oder privat) in einer Datei mit pickle."""
     with open(filename, 'wb') as f:
         pickle.dump(key, f)
 
 def load_key(filename):
-    """Loads the key (public or private) from a file using pickle."""
+    """Laedt den Schlüssel (öffentlich oder privat) aus einer Datei mit pickle."""
     with open(filename, 'rb') as f:
         return pickle.load(f)
 
@@ -120,7 +126,7 @@ def get_encrypted_filename(original_filename):
     return f"{name}_encrypted{ext}"
 
 def get_decrypted_filename(original_filename):
-    """Generates the filename for the decrypted file."""
+    """Erzeugt den Dateinamen für die entschlüsselte Datei."""
     # Remove '_encrypted' from the original filename and add '_decrypted'
     name, ext = os.path.splitext(original_filename)
     if name.endswith('_encrypted'):
