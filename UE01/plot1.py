@@ -30,9 +30,16 @@ ax = plt.gca()
 ax.spines['right'].set_color('none')
 ax.spines['top'].set_color('none')
 ax.xaxis.set_ticks_position('bottom')
+ax.spines['bottom'].set_bounds(min(X), max(X))
 ax.spines['bottom'].set_position(('data', 0))
 ax.yaxis.set_ticks_position('left')
 ax.spines['left'].set_position(('data', 0))
+ax.spines['left'].set_bounds(-1, 1)
+
+ax.annotate('', xy=(1.20*max(X), 0), xytext=(1.20*min(X), 0),
+                arrowprops=dict(arrowstyle='-|>,head_width=0.4,head_length=0.8', color='black', lw=4))
+ax.annotate('', xy=(0, 1.2), xytext=(0, -1.2),
+                arrowprops=dict(arrowstyle='-|>,head_width=0.4,head_length=0.8', color='black', lw=4))
 
 t = 2 * PI / 3
 plt.plot([t, t], [0, math.sin(t)], color='orange', linewidth=2.5, linestyle="--")
@@ -49,8 +56,11 @@ plt.annotate(r'$\cos\left(\frac{2\pi}{3}\right) = -\frac{1}{2}$',
 
 plt.title('Plot von Paul Waldecker', fontsize=20)
 
-plt.annotate('', xy=(PI, 0), xytext=(-PI, 0), arrowprops=dict(arrowstyle='->', color='black'))
-plt.annotate('', xy=(0, 1), xytext=(0, -1), arrowprops=dict(arrowstyle='->', color='black'))
+#plt.annotate('', xy=(PI, 0), xytext=(-PI, 0), arrowprops=dict(arrowstyle='->', color='black'))
+#plt.annotate('', xy=(0, 1), xytext=(0, -1), arrowprops=dict(arrowstyle='->', color='black'))
+
+plt.xlim(min(X) * 1.2, max(X) * 1.2)
+plt.ylim(-1.2, 1.2)
 
 for label in ax.get_xticklabels() + ax.get_yticklabels():
     label.set_fontsize(16)
