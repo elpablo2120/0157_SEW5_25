@@ -1,14 +1,27 @@
+"""
+__author__ = "Paul Waldecker"
+__email__ = "0157@htl.rennweg.at"
+__version__ = "3.0"
+__copyright__ = "Copyright 2024"
+__license__ = "GPL"
+__status__ = "Ready to Review"
+"""
 import argparse
-
 from dateutil import parser
 import subprocess
 import sys
-from collections import defaultdict
 
 from matplotlib import pyplot as plt
 
 
 def run_git_log(author, path, verbose):
+    """
+    Diese Funktion führt ein git log command aus und gibt die Ausgabe zurück
+    :param author: Der author des git repositories
+    :param path: Der absolute Pfad zum git repository
+    :param verbose: ob verbose oder nicht
+    :return: Gib die Ausgabe des git log commands zurück
+    """
     git_command = ['git', 'log', '--pretty=%an;%ad---END---', '--date=rfc']
 
     if author:
@@ -36,6 +49,11 @@ def run_git_log(author, path, verbose):
 
 
 def parse_git_log(output):
+    """
+    Diese Funktion parst die Ausgabe des git log commands
+    :param output: Git log command output
+    :return: Bereiningte Ausgabe des git log commands
+    """
     commits = output.split('---END---')
     parsed_commits = []
 
@@ -48,12 +66,17 @@ def parse_git_log(output):
 
 
 def calculate_commit_counts(parsed_commits):
-    commit_counts = {}  # Speichert Commit-Anzahl als dict mit (Wochentag, Stunde) als Schlüssel
+    """
+    Diese Funktion berechnet die Anzahl der Commits pro Wochentag und Uhrzeit
+    :param parsed_commits: nimmt als Input die bereinigte Ausgabe des git log commands
+    :return: Gib die Anzahl der Commits pro Wochentag und Uhrzeit zurück
+    """
+    commit_counts = {}
 
     for commit in parsed_commits:
         commit_date = parser.parse(commit['date'])
-        weekday = commit_date.weekday()  # Wochentag (0 = Montag, 6 = Sonntag)
-        hour = commit_date.hour  # Stunde (0-23)
+        weekday = commit_date.weekday()
+        hour = commit_date.hour
         key = (weekday, hour)
 
         if key not in commit_counts:
@@ -65,6 +88,13 @@ def calculate_commit_counts(parsed_commits):
 
 
 def create_plot(commit_counts, author, filename=None):
+    """
+    Diese Funktion erstellt ein Plot mit den Commit Daten
+    :param commit_counts: Anzahl der Commits pro Wochentag und Uhrzeit
+    :param author: Der author von dem die Commits stammen
+    :param filename: in welches File der Plot gespeichert werden soll
+    :return: gibt entweder einen Plot als Datei oder als Fernster zurück
+    """
     weekdays = []
     hours = []
     sizes = []
@@ -72,18 +102,15 @@ def create_plot(commit_counts, author, filename=None):
     for (weekday, hour), count in commit_counts.items():
         weekdays.append(weekday)
         hours.append(hour)
-        sizes.append(count * 50)  # Größe der Kreise basierend auf Commit-Anzahl
+        sizes.append(count * 50)
 
-    # Bubble-Plot erstellen
     plt.figure(figsize=(10, 6), dpi=100)
     plt.scatter(hours, weekdays, s=sizes, alpha=0.5)
 
-    # Achsen beschriften
     plt.xlabel('Uhrzeit')
     plt.ylabel('Wochentag')
     plt.title(f'{author}: {sum(commit_counts.values())} commits')
 
-    # Achsenlimits und Beschriftungen anpassen
     plt.xlim(-0.5, 24)
     plt.ylim(-0.5, 6.5)
     plt.yticks(ticks=[0, 1, 2, 3, 4, 5, 6], labels=['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'])
@@ -128,11 +155,9 @@ def main():
         print("Keine Commits gefunden.", file=sys.stderr)
         sys.exit(1)
 
-    # Daten parsen und Commit-Anzahl berechnen
     parsed_commits = parse_git_log(output)
     commit_counts = calculate_commit_counts(parsed_commits)
 
-    # Grafik erzeugen
     create_plot(commit_counts, args.author or "Commits", args.filename)
 
 

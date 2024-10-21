@@ -1,3 +1,11 @@
+"""
+__author__ = "Paul Waldecker"
+__email__ = "0157@htl.rennweg.at"
+__version__ = "3.0"
+__copyright__ = "Copyright 2024"
+__license__ = "GPL"
+__status__ = "Ready to Review"
+"""
 import matplotlib.pyplot as plt
 import math
 
@@ -39,10 +47,8 @@ plt.annotate(r'$\cos\left(\frac{2\pi}{3}\right) = -\frac{1}{2}$',
              xy=(t, math.cos(t)), xycoords='data', xytext=(-90, -50), textcoords='offset points',
              fontsize=16, arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.2"))
 
-# Füge Titel hinzu
 plt.title('Plot von Paul Waldecker', fontsize=20)
 
-# Pfeile bei den Achsen
 plt.annotate('', xy=(PI, 0), xytext=(-PI, 0), arrowprops=dict(arrowstyle='->', color='black'))
 plt.annotate('', xy=(0, 1), xytext=(0, -1), arrowprops=dict(arrowstyle='->', color='black'))
 
