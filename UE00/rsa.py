@@ -11,6 +11,8 @@ import logging
 import os
 import pickle
 import random
+from pathlib import Path
+
 import miller_rabin
 import math
 
@@ -60,6 +62,7 @@ def generate_keys(bits: int):
 
     return public_key, private_key
 
+
 def file2ints(filename, bytelength):
     """
     Liesst eine Datei und gibt die Bytes als Integer zurück.
@@ -98,6 +101,7 @@ def encryptFile(clearfile, cryptfile, public_key):
     for i in file2ints(clearfile, public_key[1].bit_length() // 8):
         ints2file(cryptfile, [pow(i, public_key[0], public_key[1])], public_key[1].bit_length() // 8 + 1)
 
+
 def decryptFile(cryptfile, clearfile, private_key):
     """
     Encrypts a message using the public key.
@@ -110,83 +114,79 @@ def decryptFile(cryptfile, clearfile, private_key):
     for i in file2ints(cryptfile, private_key[1].bit_length() // 8 + 1):
         ints2file(clearfile, [pow(i, private_key[0], private_key[1])], private_key[1].bit_length() // 8)
 
+
 def save_key(key, filename):
     """Speichert den Schlüssel (öffentlich oder privat) in einer Datei mit pickle."""
     with open(filename, 'wb') as f:
         pickle.dump(key, f)
+
 
 def load_key(filename):
     """Laedt den Schlüssel (öffentlich oder privat) aus einer Datei mit pickle."""
     with open(filename, 'rb') as f:
         return pickle.load(f)
 
-def get_encrypted_filename(original_filename):
-    """Erzeugt den Dateinamen für die verschlüsselte Datei."""
-    name, ext = os.path.splitext(original_filename)
-    return f"{name}_encrypted{ext}"
-
-def get_decrypted_filename(original_filename):
-    """Erzeugt den Dateinamen für die entschlüsselte Datei."""
-    name, ext = os.path.splitext(original_filename)
-    if name.endswith('_encrypted'):
-        name = name[:-len('_encrypted')]
-    return f"{name}_decrypted{ext}"
-
-
-
 
 def main():
-    parser = argparse.ArgumentParser(description="RSA Encryption and Decryption")
+    parser = argparse.ArgumentParser(description="RSA Encryption/Decryption Tool")
+
     parser.add_argument("-v", "--verbosity", help="increase output verbosity", action="store_true")
 
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-k", "--keygen", help="generate new keys with the given length", type=int)
-    group.add_argument("-e", "--encrypt", help="encrypt a file", type=str)
-    group.add_argument("-d", "--decrypt", help="decrypt a file", type=str)
+    group.add_argument("-k", "--keygen", help="generate new RSA keys with the given bit length", type=int)
+    group.add_argument("-e", "--encrypt", help="encrypt a file")
+    group.add_argument("-d", "--decrypt", help="decrypt a file")
 
     args = parser.parse_args()
 
-    # Setup logging
     if args.verbosity:
         logging.basicConfig(level=logging.INFO)
         logging.info("Verbosity turned on")
-    else:
-        logging.basicConfig(level=logging.WARNING)
 
+    # Key generation
     if args.keygen:
-        # Generate keys and save them
-        logging.info(f"Generating keys of length {args.keygen} bits")
-        public_key, private_key = generate_keys(args.keygen)
-        save_key(public_key, "public_key.pem")
-        save_key(private_key, "private_key.pem")
-        logging.info("Keys generated and saved to public_key.pem and private_key.pem")
+        logging.info(f"Generating RSA keys of length {args.keygen} bits...")
+        private_key, public_key = generate_keys(args.keygen)
 
+        # Save the keys
+        save_key(private_key, 'private_key.pem')
+        save_key(public_key, 'public_key.pem')
+        logging.info(f"Keys saved to 'private_key.pem' and 'public_key.pem'.")
+
+    # File encryption
     elif args.encrypt:
-        # Encrypt the file
         logging.info(f"Encrypting file: {args.encrypt}")
-        public_key = load_key("public_key.pem")
-        encrypted_filename = get_encrypted_filename(args.encrypt)
-        encryptFile(args.encrypt, encrypted_filename, public_key)
-        logging.info(f"File encrypted and saved as {encrypted_filename}")
+        if not Path("public_key.pem").is_file():
+            logging.error("Public key not found. Please generate keys first.")
+            return
 
+        public_key = load_key('public_key.pem')
+        output_file = args.encrypt + ".enc"
+        encryptFile(args.encrypt, output_file, public_key)
+        logging.info(f"File encrypted to: {output_file}")
+
+    # File decryption
     elif args.decrypt:
-        # Decrypt the file
         logging.info(f"Decrypting file: {args.decrypt}")
-        private_key = load_key("private_key.pem")
-        decrypted_filename = get_decrypted_filename(args.decrypt)
-        decryptFile(args.decrypt, decrypted_filename, private_key)
-        logging.info(f"File decrypted and saved as {decrypted_filename}")
+        if not Path("private_key.pem").is_file():
+            logging.error("Private key not found. Please generate keys first.")
+            return
+
+        private_key = load_key('private_key.pem')
+        output_file = args.decrypt.replace(".enc", ".dec")  # Removing the .enc extension
+        decryptFile(args.decrypt, output_file, private_key)
+        logging.info(f"File decrypted to: {output_file}")
 
 
 if __name__ == "__main__":
-    #private_key, public_key = generate_keys(1024)
-    #print(f"Private key: {private_key[0].bit_length()}")
-    #print(f"Public key: {public_key[0].bit_length()}")
-    #print(f"Private key bit length: {private_key[2]}")
-    #print(f"Public key bit length: {public_key[2]}")
-    #print(f"n bit length: {public_key[1].bit_length()}")
+    # private_key, public_key = generate_keys(1024)
+    # print(f"Private key: {private_key[0].bit_length()}")
+    # print(f"Public key: {public_key[0].bit_length()}")
+    # print(f"Private key bit length: {private_key[2]}")
+    # print(f"Public key bit length: {public_key[2]}")
+    # print(f"n bit length: {public_key[1].bit_length()}")
 
-    #encryptFile("test.txt", "test_encrypted.txt", public_key)
-    #decryptFile("test_encrypted.txt", "test_decrypted.txt", private_key)
+    # encryptFile("test.txt", "test_encrypted.txt", public_key)
+    # decryptFile("test_encrypted.txt", "test_decrypted.txt", private_key)
 
     main()
