@@ -4,7 +4,7 @@ import math
 PI = math.pi
 CNT = 1024
 # CNT Werte von -pi bis pi
-X = [2*PI*i/CNT - PI for i in range(CNT)]
+X = [2 * PI * i / CNT - PI for i in range(CNT)]
 C = [math.cos(x) for x in X]
 S = [math.sin(x) for x in X]
 
@@ -15,7 +15,7 @@ plt.plot(X, S, color="orange", linewidth=2.5, linestyle="-.", label="Sinus")
 
 plt.legend(loc='upper left', frameon=False)
 
-plt.xticks([-PI, -PI/2, 0, PI/2, PI], [r'$-\pi$', r'$-\pi/2$', r'$0$', r'$+\pi/2$', r'$+\pi$'])
+plt.xticks([-PI, -PI / 2, 0, PI / 2, PI], [r'$-\pi$', r'$-\pi/2$', r'$0$', r'$+\pi/2$', r'$+\pi$'])
 plt.yticks([-1, 0, 1], [r'$-1$', r'$0$', r'$+1$'])
 
 ax = plt.gca()
@@ -26,8 +26,6 @@ ax.spines['bottom'].set_position(('data', 0))
 ax.yaxis.set_ticks_position('left')
 ax.spines['left'].set_position(('data', 0))
 
-
-# Original markierte Punkte für 2π/3
 t = 2 * PI / 3
 plt.plot([t, t], [0, math.sin(t)], color='orange', linewidth=2.5, linestyle="--")
 plt.scatter([t], [math.sin(t)], 50, color='orange')
@@ -38,7 +36,7 @@ plt.annotate(r'$\sin\left(\frac{2\pi}{3}\right)=\frac{\sqrt{3}}{2}$',
 plt.plot([t, t], [0, math.cos(t)], color='green', linewidth=2.5, linestyle="--")
 plt.scatter([t], [math.cos(t)], 50, color='green')
 plt.annotate(r'$\cos\left(\frac{2\pi}{3}\right) = -\frac{1}{2}$',
-             xy=(t, math.cos(t)), xycoords='data', xytext=(+10, +30), textcoords='offset points',
+             xy=(t, math.cos(t)), xycoords='data', xytext=(-90, -50), textcoords='offset points',
              fontsize=16, arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.2"))
 
 # Füge Titel hinzu
