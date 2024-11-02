@@ -36,6 +36,14 @@ def read_gpx(file_path: str) -> List[Tuple]:
         data.append((timestamp, lon, lat, altitude))
     return data
 
+def filter_by_altitude(data: List[Tuple], min_alt: float, max_alt: float) -> List[Tuple]:
+    filtered_data = []
+    for point in data:
+        altitude = point[3]
+        if (min_alt is None or altitude >= min_alt) and (max_alt is None or altitude <= max_alt):
+            filtered_data.append(point)
+    return filtered_data
+
 def main():
     parser = argparse.ArgumentParser(description="skitrack by Paul Waldecker")
     parser.add_argument("infile", help="Input-Datei (z.B. track.gpx oder track.csv)")
