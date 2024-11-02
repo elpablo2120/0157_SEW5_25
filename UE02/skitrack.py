@@ -60,6 +60,12 @@ def plot_data(data: List[Tuple], args: argparse.Namespace) -> None:
 
     plt.savefig(args.out)
 
+def save_csv(data, file_path):
+    with open(file_path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile, delimiter=';')
+        for row in data:
+            writer.writerow(row)
+
 
 def main():
     parser = argparse.ArgumentParser(description="skitrack by Paul Waldecker")
@@ -75,10 +81,27 @@ def main():
     parser.add_argument("-q", "--quiet", action="store_true", help="keine Textausgabe")
     args = parser.parse_args()
 
+    # Datei basierend auf dem Dateityp laden
     data = read_csv(args.infile) if args.infile.endswith(".csv") else read_gpx(args.infile)
+    data = filter_by_altitude(data, args.tal, args.spitze)
 
+    # Ausgabe für verbose
+    if args.verbose and not args.quiet:
+        altitudes = [point[3] for point in data]
+        print(f"Niedrigster Punkt: {min(altitudes)}")
+        print(f"Höchster Punkt: {max(altitudes)}")
+        print(f"Anzahl der Wegpunkte: {len(data)}")
+        if args.marker:
+            print(f"Startpunkt: {data[0]}")
+            print(f"Endpunkt: {data[-1]}")
+
+    # Ausgabe basierend auf Dateityp
+    if args.out.endswith(".csv"):
+        save_csv(data, args.out)
+    elif args.out.endswith(".png"):
+        plot_data(data, args)
+    else:
+        print("Invalid output file extension. Only .csv or .png are allowed.")
 
 if __name__ == "__main__":
-    #print(read_csv("ski.csv"))
-    #print(read_gpx("ski.gpx"))
     main()
