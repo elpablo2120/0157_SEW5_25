@@ -8,6 +8,7 @@ __status__ = "Ready to Review"
 """
 import csv
 from typing import List, Tuple
+import xml.etree.ElementTree as ET
 
 
 def read_csv(file_path: str) -> List[Tuple]:
@@ -22,5 +23,21 @@ def read_csv(file_path: str) -> List[Tuple]:
             data.append((timestamp, lon, lat, altitude))
     return data
 
+def read_gpx(file_path: str) -> List[Tuple]:
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+    data = []
+    for trkpt in root.findall(".//{*}trkpt"):
+        lon = float(trkpt.get("lon"))
+        lat = float(trkpt.get("lat"))
+        altitude = float(trkpt.find("{*}ele").text)
+        timestamp = trkpt.find("{*}time").text
+        data.append((timestamp, lon, lat, altitude))
+    return data
+
+
+
+
 if __name__ == "__main__":
-    print(read_csv("ski.csv"))
+    #print(read_csv("ski.csv"))
+    print(read_gpx("ski.gpx"))
