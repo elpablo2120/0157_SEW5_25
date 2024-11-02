@@ -11,6 +11,8 @@ import csv
 from typing import List, Tuple
 import xml.etree.ElementTree as ET
 
+from matplotlib import pyplot as plt
+
 
 def read_csv(file_path: str) -> List[Tuple]:
     data = []
@@ -43,6 +45,21 @@ def filter_by_altitude(data: List[Tuple], min_alt: float, max_alt: float) -> Lis
         if (min_alt is None or altitude >= min_alt) and (max_alt is None or altitude <= max_alt):
             filtered_data.append(point)
     return filtered_data
+
+def plot_data(data: List[Tuple], args: argparse.Namespace) -> None:
+    x = [point[1] for point in data]
+    y = [point[2] for point in data]
+    colors = tuple([int(c) / 255 for c in args.dot.split(',')]) if args.dot else (0, 0, 1)
+    line_color = tuple([int(c) / 255 for c in args.line.split(',')]) if args.line else (0, 1, 0)
+
+    plt.scatter(x, y, color=[colors], alpha=0.5)
+    if args.connect:
+        plt.plot(x, y, color=line_color, alpha=0.5)
+    if args.marker:
+        plt.scatter([x[0], x[-1]], [y[0], y[-1]], color="red", marker="x")
+
+    plt.savefig(args.out)
+
 
 def main():
     parser = argparse.ArgumentParser(description="skitrack by Paul Waldecker")
