@@ -6,6 +6,7 @@ __copyright__ = "Copyright 2024"
 __license__ = "GPL"
 __status__ = "Ready to Review"
 """
+import argparse
 import csv
 from typing import List, Tuple
 import xml.etree.ElementTree as ET
@@ -35,9 +36,24 @@ def read_gpx(file_path: str) -> List[Tuple]:
         data.append((timestamp, lon, lat, altitude))
     return data
 
+def main():
+    parser = argparse.ArgumentParser(description="skitrack by Paul Waldecker")
+    parser.add_argument("infile", help="Input-Datei (z.B. track.gpx oder track.csv)")
+    parser.add_argument("-o", "--out", help="Zu generierende Datei, z.B. ski.csv oder ski.png")
+    parser.add_argument("-m", "--marker", action="store_true", help="Sollen der erste und letzte Punkt markiert werden?")
+    parser.add_argument("-t", "--tal", type=float, help="Seehöhe des niedrigsten Punktes, der noch ausgewertet werden soll")
+    parser.add_argument("-s", "--spitze", type=float, help="Seehöhe des höchsten Punktes, der noch ausgewertet werden soll")
+    parser.add_argument("-d", "--dot", help="RGB color for points, e.g., 128,128,255")
+    parser.add_argument("-c", "--connect", action="store_true", help="Connect points with lines")
+    parser.add_argument("-l", "--line", help="RGB-Farbe der Linien z.B.: 255,128,255")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Zeigt Details an")
+    parser.add_argument("-q", "--quiet", action="store_true", help="keine Textausgabe")
+    args = parser.parse_args()
 
+    data = read_csv(args.infile) if args.infile.endswith(".csv") else read_gpx(args.infile)
 
 
 if __name__ == "__main__":
     #print(read_csv("ski.csv"))
-    print(read_gpx("ski.gpx"))
+    #print(read_gpx("ski.gpx"))
+    main()
