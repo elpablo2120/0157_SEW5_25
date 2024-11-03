@@ -15,6 +15,11 @@ from matplotlib import pyplot as plt
 
 
 def read_csv(file_path: str) -> List[Tuple]:
+    """
+    Liest ein CSV-File ein und gibt eine Liste von Tupeln zurück
+    :param file_path: Pfad zur CSV-Datei
+    :return: Liste von Tupeln mit (timestamp, lon, lat, altitude)
+    """
     data = []
     with open(file_path, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=';')
@@ -27,6 +32,11 @@ def read_csv(file_path: str) -> List[Tuple]:
     return data
 
 def read_gpx(file_path: str) -> List[Tuple]:
+    """
+    Liest ein GPX-File ein und gibt eine Liste von Tupeln zurück
+    :param file_path: Pfad zur GPX-Datei
+    :return: Liste von Tupeln mit (timestamp, lon, lat, altitude)
+    """
     tree = ET.parse(file_path)
     root = tree.getroot()
     data = []
@@ -39,6 +49,13 @@ def read_gpx(file_path: str) -> List[Tuple]:
     return data
 
 def filter_by_altitude(data: List[Tuple], min_alt: float, max_alt: float) -> List[Tuple]:
+    """
+    Filtert die Daten nach Seehöhe
+    :param data: Liste von Tupeln mit (timestamp, lon, lat, altitude)
+    :param min_alt: Minimale Seehöhe
+    :param max_alt: Maximale Seehöhe
+    :return: Gefilterte Liste von Tupeln mit (timestamp, lon, lat, altitude)
+    """
     filtered_data = []
     for point in data:
         altitude = point[3]
@@ -47,6 +64,11 @@ def filter_by_altitude(data: List[Tuple], min_alt: float, max_alt: float) -> Lis
     return filtered_data
 
 def plot_data(data: List[Tuple], args: argparse.Namespace) -> None:
+    """
+    Erstellt ein Scatterplot der Daten
+    :param data: Liste von Tupeln mit (timestamp, lon, lat, altitude)
+    :param args: Argumente des Programms
+    """
     x = [point[1] for point in data]
     y = [point[2] for point in data]
     colors = tuple([int(c) / 255 for c in args.dot.split(',')]) if args.dot else (0, 0, 1)
@@ -61,6 +83,11 @@ def plot_data(data: List[Tuple], args: argparse.Namespace) -> None:
     plt.savefig(args.out)
 
 def save_csv(data, file_path):
+    """
+    Speichert die Daten in einer CSV-Datei
+    :param data: Liste von Tupeln mit (timestamp, lon, lat, altitude)
+    :param file_path: Pfad zur CSV-Datei
+    """
     with open(file_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile, delimiter=';')
         for row in data:
