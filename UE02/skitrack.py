@@ -79,9 +79,9 @@ def plot_data(data: List[Tuple], args: argparse.Namespace) -> None:
         plt.plot(x, y, color=line_color, alpha=0.5)
     if args.marker:
         plt.scatter([x[0], x[-1]], [y[0], y[-1]], color="red", marker="x")
-        plt.annotate('Start', xy=(x[0], y[0]), xytext=(x[0] + 0.005, y[0] + 0.005),
+        plt.annotate('Start', xy=(x[0], y[0]), xytext=(x[0] - 0.005, y[0] + 0.005),
                      arrowprops=dict(facecolor='blue', shrink=0.05))
-        plt.annotate('End', xy=(x[-1], y[-1]), xytext=(x[-1] + 0.005, y[-1] + 0.005),
+        plt.annotate('End', xy=(x[-1], y[-1]), xytext=(x[-1] + 0.005, y[-1] - 0.005),
                      arrowprops=dict(facecolor='red', shrink=0.05))
 
     plt.savefig(args.out)
