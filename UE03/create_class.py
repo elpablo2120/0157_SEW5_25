@@ -43,7 +43,7 @@ def generate_password_student(class_name, room_number, advisor) -> str:
     random_char = secrets.choice(special_chars)
     return f"{class_name[0]}{random_char}{room_number[:3]}{advisor[0].upper()}"
 
-def generate_password_teacher_seminar(length=12) -> str:
+def generate_password_twelve(length=12) -> str:
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!%&(),._-=^#"
     return ''.join(secrets.choice(chars) for _ in range(length))
 
@@ -85,7 +85,7 @@ with open(add_script_path, "w") as add_script, open(del_script_path, "w") as del
 
     for user in ["lehrer", "seminar"]:
         username = user
-        password = generate_password_teacher_seminar()
+        password = generate_password_twelve()
         home_dir = f"/home/lehrer/{username}"
 
         add_script.write(
