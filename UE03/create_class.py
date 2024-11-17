@@ -1,10 +1,12 @@
-import pandas as pd
+
 import unicodedata
 import secrets
 import os
 import logging
 import argparse
 from logging.handlers import RotatingFileHandler
+
+import pandas as pd
 
 # Argument parser setup
 parser = argparse.ArgumentParser(description="Create class users from an Excel file.")
@@ -29,7 +31,8 @@ console_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(
 logger.addHandler(console_handler)
 
 def normalize_username(name: str) -> str:
-    name = name.replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue').replace('ß', 'ss')
+    name = name.replace('ä', 'ae').replace('Ä', 'Ae').replace('ö', 'oe').replace('Ö', 'Oe').replace('ü', 'ue').replace(
+        'Ü', 'Ue').replace('ß', 'ss')
     name = unicodedata.normalize("NFD", name)
     name = ''.join(c for c in name if not unicodedata.combining(c))
     name = name.lower().replace(" ", "_")
@@ -44,6 +47,57 @@ def generate_password_teacher_seminar(length=12) -> str:
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!%&(),._-=^#"
     return ''.join(secrets.choice(chars) for _ in range(length))
 
-if __name__ == "__main__":
+try:
+    class_data = pd.read_excel(args.input_file)
+except FileNotFoundError:
+    logger.error(f"File not found: {args.input_file}")
+    exit(1)
 
+add_script_path = "./output/class_add.sh"
+del_script_path = "./output/class_del.sh"
+csv_path = "./output/class.csv"
+
+with open(add_script_path, "w") as add_script, open(del_script_path, "w") as del_script:
+    add_script.write("#!/bin/bash\n")
+    del_script.write("#!/bin/bash\n")
+
+    csv_data = []
+    for _, row in (x for x in class_data.iterrows() if not pd.isnull(x[1]["Klasse"])):
+        class_name = str(row["Klasse"])
+        room_number = str(row["Raum Nr."])
+        advisor = str(row["KV"])
+
+        username = f"k{normalize_username(class_name)}"
+        password = generate_password_student(class_name, room_number, advisor)
+
+        home_dir = f"/home/klassen/{username}"
+        groups = "cdrom,plugdev,sambashare"
+
+        add_script.write(
+            f"useradd -m -d {home_dir} -s /bin/bash -c '{class_name}' -G {groups} {username}\n"
+            f"echo '{username}:{password}' | chpasswd\n"
+        )
+        del_script.write(f"userdel -r {username}\n")
+
+        csv_data.append({"Username": username, "Password": password, "Home": home_dir})
+
+        logger.debug(f"Created user {username} with password {password} and home directory {home_dir} for class {class_name} in room {room_number} with advisor {advisor}.")
+
+    for user in ["lehrer", "seminar"]:
+        username = user
+        password = generate_password_teacher_seminar()
+        home_dir = f"/home/lehrer/{username}"
+
+        add_script.write(
+            f"useradd -m -d {home_dir} -s /bin/bash -c '{username}' -G {groups} {username}\n"
+            f"echo '{username}:{password}' | chpasswd\n"
+        )
+        del_script.write(f"userdel -r {username}\n")
+
+        csv_data.append({"Username": username, "Password": password, "Home": home_dir})
+
+csv_df = pd.DataFrame(csv_data)
+csv_df.to_csv(csv_path, index=False)
+
+logger.info("Scripts class_add.sh, class_del.sh, and class.csv successfully created.")
 
