@@ -1,5 +1,32 @@
-import secrets
+import pandas as pd
 import unicodedata
+import secrets
+import os
+import logging
+import argparse
+from logging.handlers import RotatingFileHandler
+
+# Argument parser setup
+parser = argparse.ArgumentParser(description="Create class users from an Excel file.")
+parser.add_argument("input_file", help="Path to the input Excel file")
+parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose logging")
+parser.add_argument("-q", "--quiet", action="store_true", help="Enable quiet logging")
+args = parser.parse_args()
+
+# Logging configuration
+log_file = "./output/create_class.log"
+os.makedirs("./output", exist_ok=True)
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG if args.verbose else logging.WARNING if args.quiet else logging.INFO)
+
+handler = RotatingFileHandler(log_file, maxBytes=10000, backupCount=5)
+handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+logger.addHandler(handler)
+
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
+logger.addHandler(console_handler)
 
 def normalize_username(name: str) -> str:
     name = name.replace('ä', 'ae').replace('ö', 'oe').replace('ü', 'ue').replace('ß', 'ss')
