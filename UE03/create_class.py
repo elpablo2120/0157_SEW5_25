@@ -100,4 +100,3 @@ csv_df = pd.DataFrame(csv_data)
 csv_df.to_csv(csv_path, index=False)
 
 logger.info("Scripts class_add.sh, class_del.sh, and class.csv successfully created.")
-
