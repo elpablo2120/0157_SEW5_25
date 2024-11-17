@@ -5,9 +5,7 @@ import os
 import logging
 import argparse
 from logging.handlers import RotatingFileHandler
-import create_class as cc
 
-# Argument parser setup
 parser = argparse.ArgumentParser(description="Create user accounts from an Excel file.")
 parser.add_argument("input_file", help="Path to the input Excel file")
 parser.add_argument("-o", "--output", choices=["csv", "xlsx"], default="csv", help="Output format: csv or xlsx")
@@ -29,6 +27,17 @@ console_handler = logging.StreamHandler()
 console_handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
 logger.addHandler(console_handler)
 
+def normalize_username(name: str) -> str:
+    name = name.replace('ä', 'ae').replace('Ä', 'Ae').replace('ö', 'oe').replace('Ö', 'Oe').replace('ü', 'ue').replace(
+        'Ü', 'Ue').replace('ß', 'ss')
+    name = unicodedata.normalize("NFD", name)
+    name = ''.join(c for c in name if not unicodedata.combining(c))
+    name = name.lower().replace(" ", "_")
+    return ''.join(c for c in name if c.isalnum() or c == "_")
+
+def generate_random_password(length=12) -> str:
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!%&(),._-=^#"
+    return ''.join(random.choice(chars) for _ in range(length))
 
 try:
     user_data = pd.read_excel(args.input_file)
@@ -36,7 +45,6 @@ except FileNotFoundError:
     logger.error(f"File not found: {args.input_file}")
     exit(1)
 
-# Prepare script contents
 add_script_path = "./output/user_add.sh"
 output_path = f"./output/user.{args.output}"
 
@@ -48,9 +56,8 @@ with open(add_script_path, "w") as add_script:
     for _, row in user_data.iterrows():
         last_name = str(row["lastname"])
         groups = str(row["group"]) + ",cdrom,plugdev,sambashare," + str(row["class"])
-        username = cc.normalize_username(last_name)
+        username = normalize_username(last_name)
 
-        # Handle duplicate usernames
         if username in usernames:
             count = usernames[username] + 1
             usernames[username] = count
@@ -58,7 +65,7 @@ with open(add_script_path, "w") as add_script:
         else:
             usernames[username] = 0
 
-        password = cc.generate_password_twelve()
+        password = generate_random_password()
         home_dir = f"/home/{username}"
 
         add_script.write(
