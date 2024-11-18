@@ -1,3 +1,11 @@
+"""
+__author__ = "Paul Waldecker"
+__email__ = "0157@htl.rennweg.at"
+__version__ = "3.0"
+__copyright__ = "Copyright 2024"
+__license__ = "GPL"
+__status__ = "Ready to Review"
+"""
 
 import unicodedata
 import secrets
@@ -6,7 +14,7 @@ import logging
 import argparse
 from logging.handlers import RotatingFileHandler
 import pandas as pd
-import stat
+
 
 def normalize_username(name: str) -> str:
     """
@@ -23,19 +31,21 @@ def normalize_username(name: str) -> str:
     name = name.lower().replace(" ", "_")
     return ''.join(c for c in name if c.isalnum() or c == "_")
 
-def generate_password_student(class_name, room_number, advisor) -> str:
+
+def generate_password_class(class_name, room_number, advisor) -> str:
     """
     Generiere ein Passwort für Schüler im Format: KlasseZufallszeichenRaumNrKV
     @param class_name: Der Name der Klasse
     @param room_number: Die Raumnummer
     @param advisor: Der Klassenlehrer
     @return: Das generierte Passwort
-    >>> generate_password_student("4A", "123", "Mustermann")
+    >>> generate_password_class("4A", "123", "Mustermann")
     '4!123M'
     """
     special_chars = "!%&(),._-=^#"
     random_char = secrets.choice(special_chars.replace(',', ''))
     return f"{class_name[0]}{random_char}{room_number[:3]}{advisor[0].upper()}"
+
 
 def generate_password_twelve(length=12) -> str:
     """
@@ -45,6 +55,7 @@ def generate_password_twelve(length=12) -> str:
     """
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!%&(),._-=^#"
     return ''.join(secrets.choice(chars) for _ in range(length))
+
 
 def main():
     parser = argparse.ArgumentParser(description="Create class users from an Excel file.")
@@ -80,7 +91,6 @@ def main():
     del_script_path = "./output/class_del.sh"
     csv_path = "./output/class.csv"
 
-
     with open(add_script_path, "w") as add_script, open(del_script_path, "w") as del_script:
         add_script.write("#!/bin/bash\n")
         del_script.write("#!/bin/bash\n")
@@ -92,7 +102,7 @@ def main():
             advisor = str(row["KV"])
 
             username = f"k{normalize_username(class_name)}"
-            password = generate_password_student(class_name, room_number, advisor)
+            password = generate_password_class(class_name, room_number, advisor)
 
             home_dir = f"/home/klassen/{username}"
             groups = "cdrom,plugdev,sambashare"
@@ -105,7 +115,8 @@ def main():
 
             csv_data.append({"Username": username, "Password": password})
 
-            logger.debug(f"Created user {username} with password {password} and home directory {home_dir} for class {class_name} in room {room_number} with advisor {advisor}.")
+            logger.debug(
+                f"Created user {username} with password {password} and home directory {home_dir} for class {class_name} in room {room_number} with advisor {advisor}.")
 
         for user in ["lehrer", "seminar"]:
             username = user
@@ -123,10 +134,11 @@ def main():
     csv_df = pd.DataFrame(csv_data)
     csv_df.to_csv(csv_path, index=False)
 
-    os.chmod(add_script_path, os.stat(add_script_path).st_mode | stat.S_IEXEC)
-    os.chmod(del_script_path, os.stat(del_script_path).st_mode | stat.S_IEXEC)
+    os.chmod(add_script_path, 0o755)
+    os.chmod(del_script_path, 0o755)
 
     logger.info("Scripts class_add.sh, class_del.sh, and class.csv successfully created.")
+
 
 if __name__ == "__main__":
     main()
