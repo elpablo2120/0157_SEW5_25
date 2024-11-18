@@ -108,7 +108,7 @@ def main():
             groups = "cdrom,plugdev,sambashare"
 
             add_script.write(
-                f"useradd -m -d {home_dir} -s /bin/bash -c '{class_name}' -G {groups} {username}\n"
+                f"useradd -m -d {home_dir} -s /bin/bash -c '{username}' -G {groups} {username}\n"
                 f"echo '{username}:{password}' | chpasswd\n"
             )
             del_script.write(f"userdel -r {username}\n")

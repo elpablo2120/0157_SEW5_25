@@ -67,7 +67,7 @@ def main():
             home_dir = f"/home/{username}"
 
             add_script.write(
-                f"useradd -m -d {home_dir} -s /bin/bash -c '{last_name}' -G {groups} {username}\n"
+                f"useradd -m -d {home_dir} -s /bin/bash -c '{username}' -G {groups} {username}\n"
                 f"echo '{username}:{password}' | chpasswd\n"
             )
 
