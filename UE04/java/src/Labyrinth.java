@@ -5,7 +5,6 @@ import java.util.Arrays;
 
 /**
  * Labyrinth.java by Paul Waldecker
- * 2021-11-02
  */
 public class Labyrinth {
 	public static String[][] maps = {{
