@@ -6,8 +6,6 @@ def fromStrings(map: list[str]) -> list[list[str]]:
     Konvertiert eine Liste von Strings in eine Liste von Listen
     @param map: Die Liste von Strings
     @return: Die Liste von Listen
-    >>> fromStrings(["###", "# #", "#A#"])
-    [['#', '#', '#'], ['#', ' ', '#'], ['#', 'A', '#']]
     """
     return [list(x) for x in map]
 

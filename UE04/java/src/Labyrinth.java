@@ -134,7 +134,7 @@ public class Labyrinth {
         if (lab[zeile][spalte] == '#' || lab[zeile][spalte] == '.') return 0;
         lab[zeile][spalte] = '.';
 
-        printLabyrinth(lab);
+        //printLabyrinth(lab);
         //Thread.sleep(10); // optional
 
         int anzahl =
@@ -155,10 +155,9 @@ public class Labyrinth {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         char[][] labyrinth = fromStrings(maps[2]);
-        labyrinth = getLabyrinthFromFile(Path.of("/Users/paulwaldecker/HTL3R_Local/0157_SEW5_25/UE04/l1.txt"));
-        printLabyrinth(labyrinth);
-        System.out.println("Ausgang gefunden: " + (suchen(1, 1, labyrinth) ? "ja" : "nein"));
-
+        labyrinth = getLabyrinthFromFile(Path.of("/Users/paulwaldecker/HTL3R_Local/0157_SEW5_25/UE04/l2.txt"));
+        //printLabyrinth(labyrinth);
+        //System.out.println("Ausgang gefunden: " + (suchen(1, 1, labyrinth) ? "ja" : "nein"));
         //labyrinth = fromStrings(maps[3]);
         System.out.println("Anzahl Wege: " + alleSuchen(1, 1, labyrinth));
     }
