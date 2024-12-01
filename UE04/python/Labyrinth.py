@@ -2,13 +2,32 @@ from argparse import ArgumentParser
 import time
 
 def fromStrings(map: list[str]) -> list[list[str]]:
+    """
+    Konvertiert eine Liste von Strings in eine Liste von Listen
+    @param map: Die Liste von Strings
+    @return: Die Liste von Listen
+    >>> fromStrings(["###", "# #", "#A#"])
+    [['#', '#', '#'], ['#', ' ', '#'], ['#', 'A', '#']]
+    """
     return [list(x) for x in map]
 
 def printLabyrinth(lab: list[list[str]]) -> None:
+    """
+    Gibt das Labyrinth auf der Konsole aus
+    @param lab: Das Labyrinth als Liste von Listen
+    @return: None
+    """
     for row in lab:
         print("".join(row))
 
 def suchen(zeile: int, spalte: int, lab: list[list[str]]) -> bool:
+    """
+    Sucht den Ausgang im Labyrinth
+    @param zeile: Die Zeile, von der aus gesucht wird
+    @param spalte: Die Spalte, von der aus gesucht wird
+    @param lab: Das Labyrinth als Liste von Listen
+    @return: True, wenn der Ausgang gefunden wurde, sonst False
+    """
     if lab[zeile][spalte] == 'A':
         return True
     if lab[zeile][spalte] in ('#', '.'):
@@ -22,6 +41,13 @@ def suchen(zeile: int, spalte: int, lab: list[list[str]]) -> bool:
     return found
 
 def alleSuchen(zeile: int, spalte: int, lab: list[list[str]]) -> int:
+    """
+    Sucht alle möglichen Wege zum Ausgang im Labyrinth
+    @param zeile: Die Zeile, von der aus gesucht wird
+    @param spalte: Die Spalte, von der aus gesucht wird
+    @param lab: Das Labyrinth als Liste von Listen
+    @return: Die Anzahl der Wege zum Ausgang
+    """
     if lab[zeile][spalte] == 'A':
         return 1
     if lab[zeile][spalte] in ('#', '.'):
