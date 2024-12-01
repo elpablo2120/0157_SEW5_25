@@ -134,11 +134,11 @@ public class Labyrinth {
 		printLabyrinth(lab);
 		//Thread.sleep(10); // optional
 
-		int anzahl = 0;
-		anzahl += alleSuchen(zeile - 1, spalte, lab);
-		anzahl += alleSuchen(zeile + 1, spalte, lab);
-		anzahl += alleSuchen(zeile, spalte - 1, lab);
-		anzahl += alleSuchen(zeile, spalte + 1, lab);
+		int anzahl =
+			alleSuchen(zeile - 1, spalte, lab) +  // Oben
+			alleSuchen(zeile + 1, spalte, lab) +  // Unten
+			alleSuchen(zeile, spalte - 1, lab) +  // Links
+			alleSuchen(zeile, spalte + 1, lab); // Rechts
 
 		// WICHTIG: Pfadmarkierung bis hierher wieder löschen, um alle möglichen Pfade zu bekommen
 		lab[zeile][spalte] = ' ';
