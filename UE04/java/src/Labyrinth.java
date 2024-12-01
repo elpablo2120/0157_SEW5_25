@@ -1,3 +1,6 @@
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 /**
@@ -123,37 +126,36 @@ public class Labyrinth {
 	 * @throws InterruptedException    für die verlangsamte Ausgabe mit sleep()
 	 */
 	public static int alleSuchen(int zeile, int spalte, char[][] lab) throws InterruptedException {
-		// Checken ob A gefunden wurde
-		if (lab[zeile][spalte] == 'A') {
-			return 1;
-		}
+		if (lab[zeile][spalte] == 'A') return 1;
 
-		// Checken ob eine Wand oder eine bereits besuchte Stelle gefunden wurde
-		if (lab[zeile][spalte] == '#' || lab[zeile][spalte] == '.') {
-			return 0;
-		}
-
-		// Die dezeite Stelle als besucht markieren
+		if (lab[zeile][spalte] == '#' || lab[zeile][spalte] == '.') return 0;
 		lab[zeile][spalte] = '.';
 
+		printLabyrinth(lab);
+		//Thread.sleep(10); // optional
 
-		// Rekursiv nach dem Ausgang suchen
-		int anzahl = alleSuchen(zeile - 1, spalte, lab) // Up
-				+ alleSuchen(zeile + 1, spalte, lab) // Down
-				+ alleSuchen(zeile, spalte - 1, lab) // Left
-				+ alleSuchen(zeile, spalte + 1, lab); // Right
-		// aktuelle Stelle wieder freigeben
+		int anzahl = 0;
+		anzahl += alleSuchen(zeile - 1, spalte, lab);
+		anzahl += alleSuchen(zeile + 1, spalte, lab);
+		anzahl += alleSuchen(zeile, spalte - 1, lab);
+		anzahl += alleSuchen(zeile, spalte + 1, lab);
+
+		// WICHTIG: Pfadmarkierung bis hierher wieder löschen, um alle möglichen Pfade zu bekommen
 		lab[zeile][spalte] = ' ';
 
 		return anzahl;
 	}
 
+	public static char[][] getLabyrinthFromFile(Path path) throws IOException {
+		return fromStrings(Files.readAllLines(path).toArray(String[]::new));
+	}
 
-	public static void main(String[] args) throws InterruptedException {
-		char[][] labyrinth = fromStrings(maps[0]);
+	public static void main(String[] args) throws InterruptedException, IOException {
+		char[][] labyrinth = fromStrings(maps[3]);
 		printLabyrinth(labyrinth);
 		System.out.println("Ausgang gefunden: " + (suchen(1, 1, labyrinth) ? "ja" : "nein"));
-		// TODO: System.out.println("Anzahl Wege: " + suchenAlle(5, 5, labyrinth));
 
+		labyrinth = fromStrings(maps[3]);
+		System.out.println("Anzahl Wege: " + alleSuchen(1, 1, labyrinth));
 	}
 }
