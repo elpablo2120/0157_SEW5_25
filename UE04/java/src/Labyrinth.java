@@ -1,3 +1,4 @@
+import java.util.Arrays;
 
 /**
  * Labyrinth.java by Paul Waldecker
@@ -67,8 +68,7 @@ public class Labyrinth {
 	 * @return char[][] des Plans
 	 */
 	public static char[][] fromStrings(String[] map) {
-		// TODO Code fehlt noch
-		return null;
+		return Arrays.stream(map).map(String::toCharArray).toArray(char[][]::new);
 	}
 
 
@@ -77,7 +77,7 @@ public class Labyrinth {
 	 * @param lab
 	 */
 	public static void printLabyrinth(char[][] lab) {
-		// TODO Code fehlt noch
+		Arrays.stream(lab).forEach(System.out::println);
 	}
 
 	/**
@@ -88,11 +88,32 @@ public class Labyrinth {
 	 * @throws InterruptedException    für die verlangsamte Ausgabe mit sleep()
 	 */
 	public static boolean suchen(int zeile, int spalte, char[][] lab) throws InterruptedException {
-		// TODO Code fehlt noch
-		// nur lab[zeile][spalte] betrachten
-		return false;
-	}
+		// Checken ob A gefunden wurde
+		if (lab[zeile][spalte] == 'A') {
+			return true;
+		}
 
+		// Checken ob eine Wand oder eine bereits besuchte Stelle gefunden wurde
+		if (lab[zeile][spalte] == '#' || lab[zeile][spalte] == '.') {
+			return false;
+		}
+
+		// Die dezeite Stelle als besucht markieren
+		lab[zeile][spalte] = '.';
+
+
+		// Rekursiv nach dem Ausgang suchen
+		boolean found = suchen(zeile - 1, spalte, lab) // Up
+				|| suchen(zeile + 1, spalte, lab) // Down
+				|| suchen(zeile, spalte - 1, lab) // Left
+				|| suchen(zeile, spalte + 1, lab); // Right
+
+		// aktuelle Stelle wieder freigeben
+		lab[zeile][spalte] = ' ';
+
+		return found;
+	}
+/*
 	/**
 	 * Ermittelt die Anzahl der Wege, die aus dem Labyrinth führen
 	 * @param zeile     aktuelle Position
@@ -101,16 +122,18 @@ public class Labyrinth {
 	 * @return anzahl Anzahl der unterschiedlichen Wege, die aus dem Labyrinth führen (ein bereits besuchtes Feld darf nicht nochmals betreten werden)
 	 * @throws InterruptedException    für die verlangsamte Ausgabe mit sleep()
 	 */
+	/*
 	public static int alleSuchen(int zeile, int spalte, char[][] lab) throws InterruptedException {
 		// TODO Code fehlt noch
 		return anzahl;
 	}
-
+*/
 
 	public static void main(String[] args) throws InterruptedException {
-		char[][] labyrinth = fromStrings(maps[2]);
+		char[][] labyrinth = fromStrings(maps[0]);
 		printLabyrinth(labyrinth);
-		System.out.println("Ausgang gefunden: " + (suchen(5, 5, labyrinth) ? "ja" : "nein"));
+		System.out.println("Ausgang gefunden: " + (suchen(1, 1, labyrinth) ? "ja" : "nein"));
 		// TODO: System.out.println("Anzahl Wege: " + suchenAlle(5, 5, labyrinth));
+
 	}
 }
