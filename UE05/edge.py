@@ -8,7 +8,6 @@ __status__ = "In Progress"
 """
 from dataclasses import dataclass
 
-
 @dataclass
 class Edge:
     """
@@ -27,4 +26,3 @@ class Edge:
 
     def __str__(self) -> str:
         return f"{self.u} --{self.weight}-> {self.v}"
-
