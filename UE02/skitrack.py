@@ -13,7 +13,6 @@ import xml.etree.ElementTree as ET
 
 from matplotlib import pyplot as plt
 
-
 def read_csv(file_path: str) -> List[Tuple]:
     """
     Liest ein CSV-File ein und gibt eine Liste von Tupeln zurück

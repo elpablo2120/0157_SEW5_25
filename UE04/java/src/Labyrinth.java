@@ -137,6 +137,7 @@ public class Labyrinth {
         //printLabyrinth(lab);
         //Thread.sleep(10); // optional
 
+        //Tiefensuche
         int anzahl =
                 alleSuchen(zeile - 1, spalte, lab) +  // Oben
                         alleSuchen(zeile + 1, spalte, lab) +  // Unten
@@ -155,7 +156,7 @@ public class Labyrinth {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         char[][] labyrinth = fromStrings(maps[2]);
-        labyrinth = getLabyrinthFromFile(Path.of("/Users/paulwaldecker/HTL3R_Local/0157_SEW5_25/UE04/l2.txt"));
+        labyrinth = getLabyrinthFromFile(Path.of("/Users/paulwaldecker/HTL3R_Local/0157_SEW5_25/UE04/l3.txt"));
         //printLabyrinth(labyrinth);
         //System.out.println("Ausgang gefunden: " + (suchen(1, 1, labyrinth) ? "ja" : "nein"));
         //labyrinth = fromStrings(maps[3]);

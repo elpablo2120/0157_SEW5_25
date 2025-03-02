@@ -59,6 +59,7 @@ def alleSuchen(zeile: int, spalte: int, lab: list[list[str]]) -> int:
     return anzahl
 
 def main():
+    # Delay fehlt
     parser = ArgumentParser(description="Calculate number of ways through a labyrinth - Paul Waldecker 5CN")
     parser.add_argument("filename", help="File containing the labyrinth to solve")
     parser.add_argument("-x", "--xstart", metavar="XSTART", type=int, help="X-coordinate to start", default=1)
