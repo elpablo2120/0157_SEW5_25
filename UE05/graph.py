@@ -43,6 +43,13 @@ class Graph(Generic[V]):
         u, v = self._vertices.index(first), self._vertices.index(second)
         return self.add_edge_by_indices(u, v, w)
 
+    # Suche Knoten mit gegebenem Index
+    def vertex_at(self, index: int) -> V:
+        return self._vertices[index]
+
+    # Suche Index des gegebenen Knotens im Graphen
+    def index_of(self, vertex: V) -> int:
+        return self._vertices.index(vertex)
 
 if __name__ == "__main__":
     # Test des Graphen
@@ -64,7 +71,7 @@ if __name__ == "__main__":
     print("-----------------------------------------------------")
 
     print("Füge Kante von 'A' nach 'B' hinzu...")
-    graph.add_edge(Edge(1, 2, 1))
+    graph.add_edge(Edge(0, 1, 1))
 
     print("Füge Kante von 'B' nach 'A' mit Index hinzu...")
     graph.add_edge_by_indices(1, 0, 2)
@@ -73,6 +80,15 @@ if __name__ == "__main__":
     graph.add_edge_by_vertices('A', 'B', 3)
 
     print("-----------------------------------------------------")
+
+    print("Wer hat den Index 0?")
+    print(graph.vertex_at(0))
+
+    print("Welchen Index hat 'B'?")
+    print(graph.index_of('B'))
+
+    print("-----------------------------------------------------")
+
 
     print(f"Aktuelle Anzahl Knoten: {graph.vertex_count}")
     print(f"Aktuelle Anzahl Kanten: {graph.edge_count}")
@@ -95,15 +111,6 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-# def add_edge(self, edge: Edge) -> None:  # Eine Kante mithilfe von Knotenindizes erzeugen und hinzufügen (Hilfsmethode)
-# def add_edge_by_indices(self, u: int, v: int, w=1) -> Edge:  # Eine Kante durch Nachschlagen von Knotenindizes hinzufügen (Hilfsmethode)
-# def add_edge_by_vertices(self, first: V, second: V, w:float = 1) -> Edge:
 
 # #Ein Graph G = (V, E, w) besteht aus
 # #1. einer Menge V von Knoten (vertex)
