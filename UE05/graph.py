@@ -34,11 +34,20 @@ class Graph(Generic[V]):
     def add_edge(self, edge: Edge) -> None:
         self._edges[edge.u].append(edge)
 
+    def add_edge_by_indices(self, u: int, v: int, w: float = 1) -> Edge:
+        edge = Edge(u, v, w)
+        self.add_edge(edge)
+        return edge
+
+    def add_edge_by_vertices(self, first: V, second: V, w: float = 1) -> Edge:
+        u, v = self._vertices.index(first), self._vertices.index(second)
+        return self.add_edge_by_indices(u, v, w)
+
 
 if __name__ == "__main__":
     # Test des Graphen
     print("Erstelle neuen Graphen...")
-    graph = Graph[str](["A"])
+    graph = Graph[str]()
 
     print(f"Anzahl Knoten vor dem Hinzufügen: {graph.vertex_count}")
 
@@ -54,13 +63,40 @@ if __name__ == "__main__":
 
     print("-----------------------------------------------------")
 
-    #print("Füge Kante von 'A' nach 'B' hinzu...")
-    graph.add_edge(Edge(0, 1, 1))
+    print("Füge Kante von 'A' nach 'B' hinzu...")
+    graph.add_edge(Edge(1, 2, 1))
+
+    print("Füge Kante von 'B' nach 'A' mit Index hinzu...")
+    graph.add_edge_by_indices(1, 0, 2)
+
+    print("Füge Kante von 'A' nach 'B' mit Knoten hinzu...")
+    graph.add_edge_by_vertices('A', 'B', 3)
 
     print("-----------------------------------------------------")
 
     print(f"Aktuelle Anzahl Knoten: {graph.vertex_count}")
     print(f"Aktuelle Anzahl Kanten: {graph.edge_count}")
+
+    print("-----------------------------------------------------")
+
+    #Print all edges
+    for i, edges in enumerate(graph._edges):
+        for edge in edges:
+            print(f"Kante: {edge}")
+
+    print("-----------------------------------------------------")
+
+    #print all vertices
+    for i, vertex in enumerate(graph._vertices):
+        print(f"Vertex: {vertex}")
+
+    print("-----------------------------------------------------")
+
+
+
+
+
+
 
 
 
