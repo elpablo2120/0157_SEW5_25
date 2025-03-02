@@ -6,7 +6,7 @@ __copyright__ = "Copyright 2024"
 __license__ = "GPL"
 __status__ = "In Progress"
 """
-
+from queue import PriorityQueue
 from typing import TypeVar, Generic, List, Optional, Tuple
 from edge import Edge
 
@@ -92,7 +92,6 @@ class Graph(Generic[V]):
     def set_adjacency_matrix(self, lines: List[str]) -> None:
         # Entferne Leerzeichen und spalte die erste Zeile in Knotennamen
         headers = [col.strip() for col in lines[0].split(";")][1:]  # Skip the first empty element
-        print(f"Headers: {headers}")
 
         # Überprüfen, ob die Kopfzeile eindeutige Knoten enthält
         if len(headers) != len(set(headers)):
@@ -103,7 +102,6 @@ class Graph(Generic[V]):
 
         for row_index, line in enumerate(lines[1:]):
             cells = [cell.strip() for cell in line.split(";")]
-            print(f"Line {row_index + 1}: {cells}")
 
             # Überprüfen, ob die Zeilenlänge mit der Anzahl der Header übereinstimmt
             if len(cells) != len(headers) + 1:
@@ -128,9 +126,6 @@ class Graph(Generic[V]):
         with open(filename, 'r', encoding='utf-8') as file:
             lines = file.readlines()
 
-        # Debugging: print the lines read from the file
-        print(f"Lines read from file: {lines}")
-
         self.set_adjacency_matrix([line.strip() for line in lines])
 
     def __str__(self) -> str:
@@ -145,7 +140,105 @@ class Graph(Generic[V]):
         # H -> [('E', 5.0), ('F', 1.0), ('G', 1.0)]
         return '\n'.join(f"{self._vertices[i]} -> {self.neighbors_for_index_with_weights(i)}" for i in range(self.vertex_count))
 
+    def uniform_cost_search_by_index(self, start_index: int, goal_index: int) -> Tuple[List[Edge], str, float]:
+        """
+        Führt die Uniform-Cost-Suche im Graphen durch und gibt den Pfad zurück.
 
+        :param start_index: Index des Startknotens
+        :param goal_index: Index des Zielknotens
+        :return: Pfad als Liste von Kanten, Pfad als Zeichenkette, Kosten des Pfades
+        """
+        frontier = PriorityQueue()
+        frontier.put((0, start_index))  # Store tuples (priority, index)
+
+        came_from = {start_index: None}
+        cost_so_far = {start_index: 0}
+
+        while not frontier.empty():
+            current_priority, current_index = frontier.get()
+
+            if current_index == goal_index:
+                break
+
+            for edge in self._edges[current_index]:
+                new_cost = cost_so_far[current_index] + edge.weight
+                if edge.v not in cost_so_far or new_cost < cost_so_far[edge.v]:
+                    cost_so_far[edge.v] = new_cost
+                    priority = new_cost
+                    frontier.put((priority, edge.v))
+                    came_from[edge.v] = edge
+
+        path = []
+        current_index = goal_index
+        while current_index != start_index:
+            edge = came_from[current_index]
+            path.insert(0, edge)
+            current_index = edge.u
+
+        return path, self.edge_list_to_string(path), cost_so_far[goal_index]
+
+    def uniform_cost_search(self, start: V, goal: V) -> Tuple[List[Edge], str, float]:
+        """
+        Führt die Uniform-Cost-Suche im Graphen durch und gibt den Pfad zurück.
+
+        :param start: Startknoten
+        :param goal: Zielknoten
+        :return: Pfad als Liste von Kanten, Pfad als Zeichenkette, Kosten des Pfades
+        :return: None, wenn kein Pfad gefunden wurde
+        """
+        start_index = self.index_of(start)
+        goal_index = self.index_of(goal)
+        return self.uniform_cost_search_by_index(start_index, goal_index)
+
+    def get_longest_shortest_path_in_graph(self):
+        """
+        Findet längsten kürzesten Pfad im Graphen zwischen zwei zusammenhängenden Knoten
+        :return: Liste von Kanten, Pfad als Zeichenkette, Kosten des Pfades
+        """
+        longest_path = []
+        longest_cost = 0
+        for i in range(self.vertex_count):
+            (path, _, cost) = self.uniform_cost_search_by_index(0, i)
+            if cost > longest_cost:
+                longest_path = path
+                longest_cost = cost
+        return longest_path, self.edge_list_to_string(longest_path), longest_cost
+
+    def get_all_paths(self, start: V) -> List[str]:
+        """
+        Find all paths from a start node to all other nodes in the graph, including costs.
+
+        :param start: Start node
+        :return: List of strings representing paths and their costs
+        """
+        start_index = self.index_of(start)
+        frontier = PriorityQueue()  # Priority queue to explore nodes in order of their cost
+        frontier.put((0, start_index, []))  # Start with the start node, cost is 0 and no path yet
+
+        visited = {}  # Dictionary to track the lowest cost to reach each node
+        paths = []  # List to store the results as strings
+
+        while not frontier.empty():
+            current_cost, current_index, path = frontier.get()
+
+            # If we've already found a cheaper way to this node, skip it
+            if current_index in visited and visited[current_index] <= current_cost:
+                continue
+
+            # Mark the node as visited with its current cost
+            visited[current_index] = current_cost
+
+            # Build the path string
+            current_path = path + [self.vertex_at(current_index)]
+            paths.append(f"(cost={current_cost:.1f}): {' -> '.join(current_path)}")
+
+            # Explore neighbors
+            for edge in self._edges[current_index]:
+                new_cost = current_cost + edge.weight
+                if edge.v not in visited or new_cost < visited[edge.v]:
+                    frontier.put((new_cost, edge.v, current_path))
+
+        return paths
 
 
 if __name__ == "__main__":
@@ -216,6 +309,18 @@ if __name__ == "__main__":
     g = Graph()
     g.read_graph_from_adjacency_matrix_file(filename)
     print(g)
+
+    #(edgelist, path, cost) = g.uniform_cost_search_by_index(0, 6)
+    #print(f"{path=} ({cost=})")
+
+    #(edgelist, path, cost) = g.uniform_cost_search("A", "G")
+    #print(f"{path=} ({cost=})")
+
+    (edgelist, path, cost) = g.get_longest_shortest_path_in_graph()
+    print(path)
+    print(cost)
+
+    print(g.get_all_paths("A"))
 
 
 
