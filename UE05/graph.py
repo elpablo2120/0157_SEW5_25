@@ -7,7 +7,7 @@ __license__ = "GPL"
 __status__ = "In Progress"
 """
 
-from typing import TypeVar, Generic, List, Optional
+from typing import TypeVar, Generic, List, Optional, Tuple
 from edge import Edge
 
 V = TypeVar('V') # Typ der Knoten im Graphen
@@ -51,6 +51,17 @@ class Graph(Generic[V]):
     def index_of(self, vertex: V) -> int:
         return self._vertices.index(vertex)
 
+    # Bestimme die benachbarte Knoten des Knotens mit dem gegebenen Index
+    # Rückgabewert ist eine Liste mit Tupeln.
+    # Letzere bestehen aus den benachbarten Knoten und den Kantengewichtungen.
+    def neighbors_for_index_with_weights(self, index: int) -> List[Tuple[V, float]]:
+        return [(self.vertex_at(edge.v), edge.weight) for edge in self._edges[index]]
+
+# Bestimme alle Kanten, die mit einem Knoten am gegebenen Index verknüpft sind
+    def edges_for_index(self, index: int) -> List[Edge]:
+        return self._edges[index]
+
+
 if __name__ == "__main__":
     # Test des Graphen
     print("Erstelle neuen Graphen...")
@@ -81,17 +92,25 @@ if __name__ == "__main__":
 
     print("-----------------------------------------------------")
 
+
+
+    print(f"Aktuelle Anzahl Knoten: {graph.vertex_count}")
+    print(f"Aktuelle Anzahl Kanten: {graph.edge_count}")
+
+    print("-----------------------------------------------------")
+
     print("Wer hat den Index 0?")
     print(graph.vertex_at(0))
 
     print("Welchen Index hat 'B'?")
     print(graph.index_of('B'))
 
-    print("-----------------------------------------------------")
+    print("Nachbarn von 'A' mit Gewichtung:")
+    print(graph.neighbors_for_index_with_weights(0))
 
+    print("Welche Kanten hat 'A'?")
+    print(graph.edges_for_index(0))
 
-    print(f"Aktuelle Anzahl Knoten: {graph.vertex_count}")
-    print(f"Aktuelle Anzahl Kanten: {graph.edge_count}")
 
     print("-----------------------------------------------------")
 
