@@ -243,33 +243,33 @@ class Graph(Generic[V]):
 
     def get_all_paths(self, start: V) -> List[str]:
         """
-        Find all paths from a start node to all other nodes in the graph, including costs.
+        Findet alle Pfade von einem Startknoten zu allen anderen Knoten im Graphen.
 
-        :param start: Start node
-        :return: List of strings representing paths and their costs
+        :param start: Startknoten
+        :return: Liste von Pfaden als Zeichenketten
         """
         start_index = self.index_of(start)
-        frontier = PriorityQueue()  # Priority queue to explore nodes in order of their cost
-        frontier.put((0, start_index, []))  # Start with the start node, cost is 0 and no path yet
+        frontier = PriorityQueue()  # Prioritätswarteschlange, um Knoten in der Reihenfolge ihrer Kosten zu erkunden
+        frontier.put((0, start_index, []))  # Start mit dem Startknoten, Kosten sind 0 und kein Pfad bisher
 
-        visited = {}  # Dictionary to track the lowest cost to reach each node
-        paths = []  # List to store the results as strings
+        visited = {}  # Wörterbuch zur Verfolgung der geringsten Kosten für das Erreichen jedes Knotens
+        paths = []  # Liste zur Speicherung der Ergebnisse als Zeichenketten
 
         while not frontier.empty():
             current_cost, current_index, path = frontier.get()
 
-            # If we've already found a cheaper way to this node, skip it
+            # Falls bereits ein günstigerer Weg zu diesem Knoten gefunden wurde, überspringen
             if current_index in visited and visited[current_index] <= current_cost:
                 continue
 
-            # Mark the node as visited with its current cost
+            # Markiere den Knoten als besucht mit seinen aktuellen Kosten
             visited[current_index] = current_cost
 
-            # Build the path string
+            # Erstelle die Pfad-Zeichenkette
             current_path = path + [self.vertex_at(current_index)]
-            paths.append(f"(cost={current_cost:.1f}): {' -> '.join(current_path)}")
+            paths.append(f"(Kosten={current_cost:.1f}): {' -> '.join(current_path)}")
 
-            # Explore neighbors
+            # Erkunde die Nachbarn
             for edge in self._edges[current_index]:
                 new_cost = current_cost + edge.weight
                 if edge.v not in visited or new_cost < visited[edge.v]:
