@@ -1,54 +1,90 @@
 """
 __author__ = "Paul Waldecker"
 __email__ = "0157@htl.rennweg.at"
-__version__ = "0.2"
+__version__ = "1.0"
 __copyright__ = "Copyright 2024"
 __license__ = "GPL"
-__status__ = "In Progress"
+__status__ = "Ready to Review"
 """
+
+# Ein Graph G = (V, E, w) besteht aus
+# 1. einer Menge V von Knoten (vertex)
+# 2. einer Menge E von Kanten (edge) zwischen einigen der Knoten
+# 3. (einer Gewichtsfunktion)
+
 from queue import PriorityQueue
 from typing import TypeVar, Generic, List, Optional, Tuple
 from edge import Edge
 
-V = TypeVar('V') # Typ der Knoten im Graphen
+V = TypeVar('V')  # Typ der Knoten im Graphen
+
 
 class Graph(Generic[V]):
     def __init__(self, vertices: List[V] = []) -> None:
-        self._vertices: List[V] = vertices # Liste aller Knoten des Graphen
+        """
+        Konstruktor für das erzeugen eines Graphen
+        :param vertices: Liste aller Knoten des Graphen
+        """
+        self._vertices: List[V] = vertices  # Liste aller Knoten des Graphen
         self._edges: List[List[Edge]] = [[] for _ in vertices]
 
     @property
     def vertex_count(self) -> int:
+        """
+        Liefert die Anzahl der Knoten im Graphen
+        """
         return len(self._vertices)
 
     @property
     def edge_count(self) -> int:
+        """
+        Liefert die Anzahl der Kanten im Graphen
+        """
         return sum(len(edges) for edges in self._edges)
 
     def add_vertex(self, vertex: V) -> int:
+        """
+        Fügt einen neuen Knoten zum Graphen hinzu.
+        return: Index des Knotens
+        """
         self._vertices.append(vertex)
         self._edges.append([])
         return len(self._vertices) - 1
 
     # Eine Kante mithilfe von Knotenindizes erzeugen und hinzufügen (Hilfsmethode)
     def add_edge(self, edge: Edge) -> None:
+        """
+        Hilfsmethode zum erzeugen und hinzufügen einer Kante
+        """
         self._edges[edge.u].append(edge)
 
     def add_edge_by_indices(self, u: int, v: int, w: float = 1) -> Edge:
+        """
+        Fügt eine Kante anhand ihres Indexes hinzu
+        """
         edge = Edge(u, v, w)
         self.add_edge(edge)
         return edge
 
     def add_edge_by_vertices(self, first: V, second: V, w: float = 1) -> Edge:
+        """
+        Fügt eine Kante anhand von Knotenobjekten hinzu
+        """
         u, v = self._vertices.index(first), self._vertices.index(second)
         return self.add_edge_by_indices(u, v, w)
 
     # Suche Knoten mit gegebenem Index
     def vertex_at(self, index: int) -> V:
+        """
+        Gibt das Knotenobjekt mit angegebenen Index zurück
+        """
         return self._vertices[index]
 
     # Suche Index des gegebenen Knotens im Graphen
     def index_of(self, vertex: V) -> int:
+        """
+        Gibt den Index des angegebenen Knotens zurück
+        """
         return self._vertices.index(vertex)
 
     # Bestimme die benachbarte Knoten des Knotens mit dem gegebenen Index
@@ -138,7 +174,8 @@ class Graph(Generic[V]):
         # F -> [('B', 3.0), ('E', 1.0), ('H', 1.0)]
         # G -> [('C', 1.0), ('D', 2.0), ('H', 1.0)]
         # H -> [('E', 5.0), ('F', 1.0), ('G', 1.0)]
-        return '\n'.join(f"{self._vertices[i]} -> {self.neighbors_for_index_with_weights(i)}" for i in range(self.vertex_count))
+        return '\n'.join(
+            f"{self._vertices[i]} -> {self.neighbors_for_index_with_weights(i)}" for i in range(self.vertex_count))
 
     def uniform_cost_search_by_index(self, start_index: int, goal_index: int) -> Tuple[List[Edge], str, float]:
         """
@@ -256,8 +293,6 @@ if __name__ == "__main__":
     index_b = graph.add_vertex('B')
     print(f"Knoten 'B' wurde an Index {index_b} hinzugefügt.")
 
-
-
     print("-----------------------------------------------------")
 
     print("Füge Kante von 'A' nach 'B' hinzu...")
@@ -270,8 +305,6 @@ if __name__ == "__main__":
     graph.add_edge_by_vertices('A', 'B', 3)
 
     print("-----------------------------------------------------")
-
-
 
     print(f"Aktuelle Anzahl Knoten: {graph.vertex_count}")
     print(f"Aktuelle Anzahl Kanten: {graph.edge_count}")
@@ -290,17 +323,16 @@ if __name__ == "__main__":
     print("Welche Kanten hat 'A'?")
     print(graph.edges_for_index(0))
 
-
     print("-----------------------------------------------------")
 
-    #Print all edges
+    # Print all edges
     for i, edges in enumerate(graph._edges):
         for edge in edges:
             print(f"Kante: {edge}")
 
     print("-----------------------------------------------------")
 
-    #print all vertices
+    # print all vertices
     for i, vertex in enumerate(graph._vertices):
         print(f"Vertex: {vertex}")
 
@@ -310,22 +342,14 @@ if __name__ == "__main__":
     g.read_graph_from_adjacency_matrix_file(filename)
     print(g)
 
-    #(edgelist, path, cost) = g.uniform_cost_search_by_index(0, 6)
-    #print(f"{path=} ({cost=})")
+    # (edgelist, path, cost) = g.uniform_cost_search_by_index(0, 6)
+    # print(f"{path=} ({cost=})")
 
-    #(edgelist, path, cost) = g.uniform_cost_search("A", "G")
-    #print(f"{path=} ({cost=})")
+    # (edgelist, path, cost) = g.uniform_cost_search("A", "G")
+    # print(f"{path=} ({cost=})")
 
     (edgelist, path, cost) = g.get_longest_shortest_path_in_graph()
     print(path)
     print(cost)
 
     print(g.get_all_paths("A"))
-
-
-
-
-# #Ein Graph G = (V, E, w) besteht aus
-# #1. einer Menge V von Knoten (vertex)
-# #2. einer Menge E von Kanten (edge) zwischen einigen der Knoten
-# #3. (einer Gewichtsfunktion)
