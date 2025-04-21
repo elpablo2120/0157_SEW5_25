@@ -171,6 +171,45 @@ def partition_entropy(subsets: List[List[Any]]) -> float:
     total_count = sum(len(subset) for subset in subsets)
     return sum((len(subset) / total_count) * data_entropy(subset) for subset in subsets)
 
+# Funktion zur Berechnung der Entropie einer Partition der Eingaben nach einem Attribut
+def partition_entropy_by(inputs: List[Any], attribute: str, label_attribute: str) -> float:
+    """
+    Berechnet die Entropie einer Partition der Eingaben nach dem angegebenen Attribut.
+
+    Parameters:
+    inputs (List[Any]): Die Liste der Eingaben, die partitioniert werden sollen.
+    attribute (str): Das Attribut, nach dem partitioniert werden soll.
+    label_attribute (str): Das Attribut, das für die Berechnung der Entropie verwendet wird.
+
+    Returns:
+    float: Der Entropiewert der Partition.
+
+    >>> inputs = readfile("res/candidates.csv")
+    >>> partition_entropy_by(inputs, 'htl', 'erfolgreich')
+    0.8885860757148734
+    """
+    partitions = partition_by(inputs, attribute)
+    labels = [[getattr(input, label_attribute) for input in partition] for partition in partitions.values()]
+    return partition_entropy(labels)
+
+
+# Funktion zur Bestimmung des Attributs mit minimaler Entropie
+def get_partition_min_entropy(inputs: List[Any], attributes: List[str], label_attribute: str) -> tuple[str, float]:
+    """
+    >>> inputs = readfile("res/candidates.csv")
+    >>> get_partition_min_entropy(inputs, ['anfangsbuchstabe', 'puenktlich', 'htl', 'sprache'],'erfolgreich')
+    ('puenktlich', 0.5290646583521217)
+    """
+    min_entropy = float('inf')
+    best_attribute = None
+
+    for attribute in attributes:
+        entropy_value = partition_entropy_by(inputs, attribute, label_attribute)
+        if entropy_value < min_entropy:
+            min_entropy = entropy_value
+            best_attribute = attribute
+
+    return best_attribute, min_entropy
 
 if __name__ == "__main__":
     candidates = readfile("candidates.csv")
