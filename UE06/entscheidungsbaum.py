@@ -7,8 +7,15 @@ __license__ = "GPL"
 __status__ = "In Progress"
 """
 
+import argparse
 import csv
-from typing import NamedTuple, Optional, TypeVar, List
+import math
+import sys
+from collections import defaultdict, Counter
+from typing import List, Optional, TypeVar, Dict, NamedTuple, Union, Any
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 class Candidate(NamedTuple):
     anfangsbuchstabe: str
@@ -76,6 +83,23 @@ def entropy(class_probabilities: List[float]) -> float:
     0.8245868399583032
     """
     return float(-sum(p * math.log2(p) for p in class_probabilities if p > 0)) + 0.0
+
+# Funktion zum Zeichnen der Entropiefunktion
+def draw_entropy():
+    """
+    Zeichne den Graphen der Entropiefunktion H(p) = -p * log2(p) im Intervall [0, 1].
+    """
+    p_values = np.linspace(0, 1, 500)
+    entropy_values = [-p * np.log2(p) if p > 0 else 0 for p in p_values]
+
+    plt.figure(figsize=(8, 6))
+    plt.plot(p_values, entropy_values, label=r'$H(p) = -p \cdot \log_2(p)$')
+    plt.title('Entropiefunktion')
+    plt.xlabel('p')
+    plt.ylabel('H(p)')
+    plt.grid(True)
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     candidates = readfile("candidates.csv")
