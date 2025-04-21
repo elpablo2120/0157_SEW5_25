@@ -101,6 +101,77 @@ def draw_entropy():
     plt.legend()
     plt.show()
 
+# Funktion zur Berechnung der relativen Häufigkeit jeder Klasse
+def class_probabilities(labels: List[Any]) -> List[float]:
+    """
+    Berechnet die relative Häufigkeit jeder Klasse in der gegebenen Liste von Labels.
+
+    Parameters:
+    labels (List[Any]): Eine Liste von Labels.
+
+    Returns:
+    List[float]: Eine Liste von relativen Häufigkeiten jeder Klasse.
+
+    >>> class_probabilities([1])
+    [1.0]
+    >>> class_probabilities([1, 1])
+    [1.0]
+    >>> class_probabilities(["a", "b", "a", "c", "a"])
+    [0.6, 0.2, 0.2]
+    """
+    total_count = len(labels)
+    count = Counter(labels)
+    return [count[label] / total_count for label in count]
+
+
+# Funktion zur Berechnung der Entropie der gegebenen Labels
+def data_entropy(labels: List[Any]) -> float:
+    """
+    Berechnet die Entropie der gegebenen Labels.
+
+    Parameters:
+    labels (List[Any]): Eine Liste von Labels.
+
+    Returns:
+    float: Der Entropiewert.
+
+    >>> data_entropy(["Huhn"])
+    0.0
+    >>> data_entropy([1, 1])
+    0.0
+    >>> data_entropy(["a", "b", "a", "c", "a"])
+    1.3709505944546687
+    """
+    probabilities = class_probabilities(labels)
+    return entropy(probabilities)
+
+
+# Funktion zur Berechnung der Entropie einer Partition von Subsets
+def partition_entropy(subsets: List[List[Any]]) -> float:
+    """
+    Berechnet die Entropie einer Partition von Subsets.
+
+    Parameters:
+    subsets (List[List[Any]]): Eine Liste von Subsets.
+
+    Returns:
+    float: Der Entropiewert der Partition.
+
+    >>> partition_entropy([["Huhn"]])
+    0.0
+    >>> partition_entropy([["Huhn"],["Kuh"]])
+    0.0
+    >>> partition_entropy([["Huhn"],["Kuh","Katze","Egel","Gelse","Spinne","Biene","Wanze"]])
+    2.456435556800403
+    >>> partition_entropy([["ja"],["ja","nein","etwas"],["nein","nein", "nein"]])
+    0.6792696431662097
+    >>> partition_entropy([["ja"],["etwas","etwas","etwas"],["nein","nein", "nein"]])
+    0.0
+    """
+    total_count = sum(len(subset) for subset in subsets)
+    return sum((len(subset) / total_count) * data_entropy(subset) for subset in subsets)
+
+
 if __name__ == "__main__":
     candidates = readfile("candidates.csv")
     print(candidates)
