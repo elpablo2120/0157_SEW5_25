@@ -53,6 +53,30 @@ def partition_by(inputs: List[T], attribute: str) -> Dict[Any, List[T]]:
         partitions[key].append(input)  # Füge die Eingabe der entsprechenden Liste hinzu
     return partitions
 
+# Funktion zur Berechnung der Entropie einer Liste von Klassenwahrscheinlichkeiten
+def entropy(class_probabilities: List[float]) -> float:
+    """
+    Berechnet die Entropie einer Liste von Klassenwahrscheinlichkeiten.
+
+    Parameters:
+    class_probabilities (List[float]): Eine Liste von Wahrscheinlichkeiten für jede Klasse.
+
+    Returns:
+    float: Der Entropiewert.
+
+    >>> entropy([0.0])
+    0.0
+    >>> entropy([1.0])
+    0.0
+    >>> entropy([0.5, 0.5])
+    1.0
+    >>> entropy([0.2, 0.8])
+    0.7219280948873623
+    >>> entropy([0.2, 0.7])
+    0.8245868399583032
+    """
+    return float(-sum(p * math.log2(p) for p in class_probabilities if p > 0)) + 0.0
+
 if __name__ == "__main__":
     candidates = readfile("candidates.csv")
     print(candidates)
