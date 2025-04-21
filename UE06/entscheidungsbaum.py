@@ -243,6 +243,35 @@ def classify(tree: DecisionTree, input: Any) -> Any:
     subtree = tree.subtrees[subtree_key]  # Wähle den passenden Unterbaum aus
     return classify(subtree, input)  # und klassifiziere den Input damit
 
+# Funktion zur Erstellung eines Entscheidungsbaums mit dem ID3-Algorithmus
+def build_tree_id3(inputs: List[Any], split_attributes: List[str], target_attribute: str) -> DecisionTree:
+    """Generiert mit dem ID3-Algorithmus einen Entscheidungsbaum aus den Inputs"""
+    # Zähle die Häufigkeit der Zielattribute
+    label_counts = Counter(getattr(input, target_attribute) for input in inputs)
+    most_common_label = label_counts.most_common(1)[0][0]
+    # Falls es nur ein einziges Label gibt, gib dieses zurück
+    if len(label_counts) == 1:
+        return Leaf(most_common_label)
+    # Falls keine Attribute mehr zum Aufteilen übrig sind, gib das häufigste Label zurück
+    if not split_attributes:
+        return Leaf(most_common_label)
+
+    # Sonst teile nach dem besten Attribut auf:
+    def split_entropy(attribute: str) -> float:
+        """Hilfsfunktion zum Finden des besten Attributs"""
+        return partition_entropy_by(inputs, attribute, target_attribute)
+
+    best_attribute = min(split_attributes, key=split_entropy)
+    partitions = partition_by(inputs, best_attribute)
+    new_attributes = [a for a in split_attributes if a != best_attribute]
+    # Unterbäume rekursiv aufbauen
+    subtrees = {attribute_value: build_tree_id3(subset,
+                                                new_attributes,
+                                                target_attribute)
+                for attribute_value, subset in partitions.items()}
+    return Split(best_attribute, subtrees, default_value=most_common_label)
+
+
 if __name__ == "__main__":
     candidates = readfile("candidates.csv")
     print(candidates)
