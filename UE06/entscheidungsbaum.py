@@ -211,6 +211,38 @@ def get_partition_min_entropy(inputs: List[Any], attributes: List[str], label_at
 
     return best_attribute, min_entropy
 
+# Klasse für Blätter im Entscheidungsbaum
+class Leaf(NamedTuple):
+    value: Any
+
+
+# Klasse für Knoten im Entscheidungsbaum
+class Split(NamedTuple):
+    attribute: str
+    subtrees: dict
+    default_value: Any = None
+
+
+DecisionTree = Union[Leaf, Split]
+
+
+# Funktion zur Klassifizierung eines Inputs anhand des Entscheidungsbaums
+def classify(tree: DecisionTree, input: Any) -> Any:
+    """Klassifiziert den Input anhand des gegebenen Entscheidungsbaums"""
+    # Wenn es ein Blatt ist, gib seinen Wert zurück
+    if isinstance(tree, Leaf):
+        return tree.value
+    # Sonst besteht dieser Baum aus einem Attribut, auf das aufgeteilt werden soll
+    # und ein Dictionary, dessen Schlüssel Werte dieses Attributs sind
+    # und dessen Werte sind die nächsten zu betrachtenden Teilbäume
+
+    subtree_key = getattr(input, tree.attribute)
+    if subtree_key not in tree.subtrees:  # Falls es keinen Unterbaum für den Key gibt
+        return tree.default_value  # gib den Standardwert zurück
+
+    subtree = tree.subtrees[subtree_key]  # Wähle den passenden Unterbaum aus
+    return classify(subtree, input)  # und klassifiziere den Input damit
+
 if __name__ == "__main__":
     candidates = readfile("candidates.csv")
     print(candidates)
