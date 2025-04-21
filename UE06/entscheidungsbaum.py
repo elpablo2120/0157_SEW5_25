@@ -19,25 +19,39 @@ class Candidate(NamedTuple):
 
 T = TypeVar('T')  # praktisch: generischer Typ für Inputs
 
-def readfile(filename: str) -> List[Candidate]:
-    """
-    Liest die Kandidaten aus einer CSV-Datei ein und gibt eine Liste von Candidate-Instanzen zurück.
-
-    >>> readfile("candidates.csv")[-1]
-    Candidate(anfangsbuchstabe='W', puenktlich=True, htl=True, sprache='Python', erfolgreich=True)
-    """
-    candidates = []
-    with open(filename, newline='') as csvfile:
-        reader = csv.DictReader(csvfile, delimiter=';')
+def readfile(filename: str) -> List[T]:
+    candidates: List[Candidate] = []
+    with open(filename, 'r') as file:
+        reader = csv.DictReader(file, delimiter=';')
         for row in reader:
             anfangsbuchstabe = row['name'][0]
-            puenktlich = row['puenktlich'].lower() == 'ja'
-            htl = row['htl'].lower() == 'ja'
+            puenktlich = row['puenktlich'] == 'ja'
+            htl = row['htl'] == 'ja'
             sprache = row['sprache']
-            erfolgreich = None if row['erfolgreich'] == '' else row['erfolgreich'].lower() == 'ja'
+            erfolgreich = row['erfolgreich'] == 'ja' if row['erfolgreich'] else None
             candidate = Candidate(anfangsbuchstabe, puenktlich, htl, sprache, erfolgreich)
             candidates.append(candidate)
     return candidates
+
+
+# Funktion zur Partitionierung der Eingaben basierend auf einem Attribut
+def partition_by(inputs: List[T], attribute: str) -> Dict[Any, List[T]]:
+    """
+    Partitioniere die Eingaben in Listen basierend auf dem angegebenen Attribut (Spaltenname).
+
+    Parameters:
+    inputs (List[T]): Die Liste der Eingaben, die partitioniert werden sollen.
+    attribute (str): Das Attribut, nach dem partitioniert werden soll.
+
+    Returns:
+    Dict[Any, List[T]]: Ein Dictionary, dessen Schlüssel die eindeutigen Werte des Attributs sind
+                        und dessen Werte Listen von Eingaben mit diesem Attributswert enthalten.
+    """
+    partitions: Dict[Any, List[T]] = defaultdict(list)
+    for input in inputs:
+        key = getattr(input, attribute)  # Hole den Wert des angegebenen Attributs
+        partitions[key].append(input)  # Füge die Eingabe der entsprechenden Liste hinzu
+    return partitions
 
 if __name__ == "__main__":
     candidates = readfile("candidates.csv")
