@@ -17,6 +17,7 @@ from typing import List, Optional, TypeVar, Dict, NamedTuple, Union, Any
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class Candidate(NamedTuple):
     anfangsbuchstabe: str
     puenktlich: bool
@@ -24,7 +25,9 @@ class Candidate(NamedTuple):
     sprache: str
     erfolgreich: Optional[bool] = None  # allow unlabeled data
 
+
 T = TypeVar('T')  # praktisch: generischer Typ für Inputs
+
 
 def readfile(filename: str) -> List[T]:
     candidates: List[Candidate] = []
@@ -60,6 +63,7 @@ def partition_by(inputs: List[T], attribute: str) -> Dict[Any, List[T]]:
         partitions[key].append(input)  # Füge die Eingabe der entsprechenden Liste hinzu
     return partitions
 
+
 # Funktion zur Berechnung der Entropie einer Liste von Klassenwahrscheinlichkeiten
 def entropy(class_probabilities: List[float]) -> float:
     """
@@ -84,6 +88,7 @@ def entropy(class_probabilities: List[float]) -> float:
     """
     return float(-sum(p * math.log2(p) for p in class_probabilities if p > 0)) + 0.0
 
+
 # Funktion zum Zeichnen der Entropiefunktion
 def draw_entropy():
     """
@@ -100,6 +105,7 @@ def draw_entropy():
     plt.grid(True)
     plt.legend()
     plt.show()
+
 
 # Funktion zur Berechnung der relativen Häufigkeit jeder Klasse
 def class_probabilities(labels: List[Any]) -> List[float]:
@@ -171,6 +177,7 @@ def partition_entropy(subsets: List[List[Any]]) -> float:
     total_count = sum(len(subset) for subset in subsets)
     return sum((len(subset) / total_count) * data_entropy(subset) for subset in subsets)
 
+
 # Funktion zur Berechnung der Entropie einer Partition der Eingaben nach einem Attribut
 def partition_entropy_by(inputs: List[Any], attribute: str, label_attribute: str) -> float:
     """
@@ -211,6 +218,7 @@ def get_partition_min_entropy(inputs: List[Any], attributes: List[str], label_at
 
     return best_attribute, min_entropy
 
+
 # Klasse für Blätter im Entscheidungsbaum
 class Leaf(NamedTuple):
     value: Any
@@ -243,6 +251,7 @@ def classify(tree: DecisionTree, input: Any) -> Any:
     subtree = tree.subtrees[subtree_key]  # Wähle den passenden Unterbaum aus
     return classify(subtree, input)  # und klassifiziere den Input damit
 
+
 # Funktion zur Erstellung eines Entscheidungsbaums mit dem ID3-Algorithmus
 def build_tree_id3(inputs: List[Any], split_attributes: List[str], target_attribute: str) -> DecisionTree:
     """Generiert mit dem ID3-Algorithmus einen Entscheidungsbaum aus den Inputs"""
@@ -272,6 +281,61 @@ def build_tree_id3(inputs: List[Any], split_attributes: List[str], target_attrib
     return Split(best_attribute, subtrees, default_value=most_common_label)
 
 
+# Hauptfunktion zur Vorhersage mit einem Entscheidungsbaum
+def predict_tree():
+    parser = argparse.ArgumentParser(description='Predict values using a decision tree.')
+    parser.add_argument('training_file', help='CSV file with training data')
+    parser.add_argument('predict_file', help='CSV file with data to predict')
+    parser.add_argument('output_file', help='CSV file to save predictions')
+    args = parser.parse_args()
+
+    # Lese Trainingsdaten ein
+    training_data = readfile(args.training_file)
+
+    # Hole Attributnamen aus dem ersten Datensatz
+    if not training_data:
+        print("Fehler: Trainingsdatei enthält keine Daten")
+        sys.exit(1)
+
+    attributes = list(training_data[0]._fields)
+    target_attribute = attributes[-1]
+    split_attributes = attributes[:-1]
+
+    # Erstelle Entscheidungsbaum
+    tree = build_tree_id3(training_data, split_attributes, target_attribute)
+
+    # Lese Vorhersagedaten ein
+    predict_data = readfile(args.predict_file)
+
+    # Führe Vorhersagen durch
+    results = []
+    for data_point in predict_data:
+        # Erstelle neuen Datensatz mit der Vorhersage
+        prediction = classify(tree, data_point)
+
+        # Hole alle Felder als Dictionary
+        data_dict = data_point._asdict()
+
+        # Aktualisiere das Zielattribut mit der Vorhersage
+        data_dict[target_attribute] = prediction
+
+        results.append(data_dict)
+
+    # Schreibe Ergebnisse in Ausgabedatei
+    with open(args.output_file, 'w', newline='') as file:
+        # Verwende denselben Delimiter wie in den Originaldateien
+        writer = csv.writer(file, delimiter=';')
+
+        # Schreibe Header-Zeile
+        writer.writerow(attributes)
+
+        # Schreibe Datenzeilen
+        for data_dict in results:
+            writer.writerow([data_dict[attr] for attr in attributes])
+
+    print(f"Vorhersagen gespeichert in {args.output_file}")
+
+
+# Beispielanwendung
 if __name__ == "__main__":
-    candidates = readfile("candidates.csv")
-    print(candidates)
+    predict_tree()
